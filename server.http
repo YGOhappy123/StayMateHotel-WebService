@@ -1,0 +1,6 @@
+@server_HostAddress = http://localhost:5000/api/v1
+
+GET {{server_HostAddress}}/rooms/
+Accept: application/json
+
+###

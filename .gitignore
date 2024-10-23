@@ -1,0 +1,85 @@
+# Ignore Visual Studio Code settings and extensions
+.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Ignore .NET build outputs
+bin/
+obj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio solution file
+*.sln
+
+# Ignore Rider IDE files (if using JetBrains Rider)
+.idea/
+
+# Ignore build logs
+build/
+msbuild.log
+
+# Ignore NuGet Packages
+*.nupkg
+*.snupkg
+
+# Ignore global NuGet packages folder for .NET SDK projects
+.nuget/
+
+# Ignore by-products of NuGet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Ignore logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore environment settings
+.env
+
+# Ignore runtime-generated files
+*.runtimeconfig.json
+*.runtimeconfig.dev.json
+
+# Ignore the .NET User Secrets folder
+secrets.json
+
+# Ignore coverage reports from tools like Coverlet
+coverage/
+*.coverage
+*.coveragexml
+*.opencover.xml
+
+# Ignore the .NET development certificate for HTTPS
+localhost.pfx
+
+# Ignore ReSharper files (if using JetBrains Rider)
+_ReSharper.Caches/
+
+# Ignore DLLs
+*.dll
+*.pdb
+
+# Ignore publish folder (when you use dotnet publish)
+publish/
+
+# Ignore files related to migrations (if using EF Core)
+Migrations/
+
+# Ignore database files (if applicable)
+*.mdf
+*.ldf
+*.db
+
+# Local app setting
+appsettings.Development.json
