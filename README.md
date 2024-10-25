@@ -93,13 +93,9 @@ Before running the project, make sure to set up the database and environment var
 
 1. Create a `appsettings.Development.json` file:
 
-    Create an empty database name `StayMateHotel` in Microsoft SQL Server
-
-2. Create a `appsettings.Development.json` file:
-
     In the root directory of your project (at the same level as `Program.cs`), create a `appsettings.Development.json` file.
 
-3. Add the following content:
+2. Add the following content to `appsettings.Development.json`:
 
     ```json
     {
@@ -109,10 +105,29 @@ Before running the project, make sure to set up the database and environment var
     }
     ```
 
-**Notes:**
+    **Notes:**
 
--   You must replace `<your_server_name>` with the actual value of your SQL Server instance.
--   Ensure that `StayMateHotel` (the database name) is correct, as the application uses migrations that depend on this database.
+    - You must replace `<your_server_name>` with the actual value of your SQL Server instance.
+
+    - Ensure that `StayMateHotel` (the database name) is correct, as the application uses migrations that depend on this database.
+
+3. Apply the migrations to create the necessary database tables. Use the following command in the terminal:
+
+    ```bash
+    dotnet ef database update
+    ```
+
+    This command will apply the existing migrations to the specified database, ensuring that the required tables are created.
+
+    **Note:** If you encounter any errors like `dotnet-ef: command not found`, install the `dotnet-ef` tool globally on your machine using the following command an retry:
+
+    ```bash
+    dotnet tool install --global dotnet-ef --version 8.0.10
+    ```
+
+4. Verify the created database:
+
+    If you don't see a database name `StayMateHotel` in your SQL Server Management Studio, try disconnecting and reconnecting your SQL Server.
 
 ## Development
 
@@ -174,46 +189,46 @@ Now you can access the app using other devices by visiting `http://<IPv4 Adddess
 Thanks to the following people for contributing to this project ✨:
 
 <table>
-  <tr>
-    <td align="center">
-        <a href="https://github.com/YGOhappy123">
-            <img 
-                src="https://avatars.githubusercontent.com/u/90592072?v=4"
-                alt="YGOhappy123" width="100px;" height="100px;" 
-                style="border-radius: 4px; background: #fff;"
-            /><br />
-            <sub><b>YGOhappy123</b></sub>
-        </a>
-    </td>
-    <td align="center">
-        <a href="https://github.com/DinhToanIT2003">
-            <img 
-                src="https://avatars.githubusercontent.com/u/126399422?v=4"
-                alt="DinhToanIT2003" width="100px;" height="100px;"                 
-                style="border-radius: 4px; background: #fff;"
-            /><br />
-            <sub><b>DinhToanIT2003</b></sub>
-        </a>
-    </td>
+    <tr>
         <td align="center">
-        <a href="https://github.com/Nguyen1609">
-            <img 
-                src="https://avatars.githubusercontent.com/u/126648891?v=4"
-                alt="Nguyen1609" width="100px;" height="100px;"
-                style="border-radius: 4px; background: #fff;"
-            /><br />
-            <sub><b>Nguyen1609</b></sub>
-        </a>
-    </td>
-    <td align="center">
-        <a href="https://github.com/vthanhdat99">
-            <img
-                src="https://avatars.githubusercontent.com/u/108580228?v=4"
-                alt="vthanhdat99" width="100px;" height="100px;" 
-                style="border-radius: 4px; background: #fff;"
-            /><br />
-            <sub><b>vthanhdat99</b></sub>
-        </a>
-    </td>
-  </tr>
+            <a href="https://github.com/YGOhappy123">
+                <img 
+                    src="https://avatars.githubusercontent.com/u/90592072?v=4"
+                    alt="YGOhappy123" width="100px;" height="100px;" 
+                    style="border-radius: 4px; background: #fff;"
+                /><br />
+                <sub><b>YGOhappy123</b></sub>
+            </a>
+        </td>
+        <td align="center">
+            <a href="https://github.com/DinhToanIT2003">
+                <img 
+                    src="https://avatars.githubusercontent.com/u/126399422?v=4"
+                    alt="DinhToanIT2003" width="100px;" height="100px;"                 
+                    style="border-radius: 4px; background: #fff;"
+                /><br />
+                <sub><b>DinhToanIT2003</b></sub>
+            </a>
+        </td>
+            <td align="center">
+            <a href="https://github.com/Nguyen1609">
+                <img 
+                    src="https://avatars.githubusercontent.com/u/126648891?v=4"
+                    alt="Nguyen1609" width="100px;" height="100px;"
+                    style="border-radius: 4px; background: #fff;"
+                /><br />
+                <sub><b>Nguyen1609</b></sub>
+            </a>
+        </td>
+        <td align="center">
+            <a href="https://github.com/vthanhdat99">
+                <img
+                    src="https://avatars.githubusercontent.com/u/108580228?v=4"
+                    alt="vthanhdat99" width="100px;" height="100px;" 
+                    style="border-radius: 4px; background: #fff;"
+                /><br />
+                <sub><b>vthanhdat99</b></sub>
+            </a>
+        </td>
+    </tr>
 </table>

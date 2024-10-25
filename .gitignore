@@ -15,6 +15,7 @@ obj/
 *.user
 *.userosscache
 *.sln.docstates
+.fake
 
 # Visual Studio solution file
 *.sln
@@ -72,9 +73,6 @@ _ReSharper.Caches/
 
 # Ignore publish folder (when you use dotnet publish)
 publish/
-
-# Ignore files related to migrations (if using EF Core)
-Migrations/
 
 # Ignore database files (if applicable)
 *.mdf

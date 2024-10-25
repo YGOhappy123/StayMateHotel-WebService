@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using server.Models;
 
 namespace server.Data
 {
@@ -11,6 +12,13 @@ namespace server.Data
         public ApplicationDBContext(DbContextOptions dbContextOptions)
             : base(dbContextOptions) { }
 
-        // public DbSet<Comment> Comments { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+        public DbSet<RoomType> RoomTypes { get; set; }
+        public DbSet<Floor> Floors { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Room>().Property(u => u.Status).HasConversion<string>();
+        }
     }
 }
