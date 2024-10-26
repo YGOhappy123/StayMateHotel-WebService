@@ -15,6 +15,7 @@ namespace server.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<Floor> Floors { get; set; }
+        public DbSet<AddOn> AddOns { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
