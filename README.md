@@ -127,7 +127,7 @@ Before running the project, make sure to set up the database and environment var
 
 4. Verify the created database:
 
-    If you don't see a database name `StayMateHotel` in your SQL Server Management Studio, try disconnecting and reconnecting your SQL Server.
+    If you don't see a database name `StayMateHotel` in your SQL Server Management Studio after refreshing, try disconnecting and reconnecting your SQL Server.
 
 ## Development
 

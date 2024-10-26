@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using server.Data;
-using server.Interfaces;
+using server.Interfaces.Repositories;
+using server.Interfaces.Services;
+using server.Repositories;
 using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +22,8 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HotelDbConnectionString"));
 });
 
-builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 var app = builder.Build();
 

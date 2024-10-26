@@ -3,31 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using server.Interfaces;
+using server.Interfaces.Repositories;
+using server.Mappers;
 
 namespace server.Controllers
 {
     [Route("/rooms")]
     public class RoomController : ControllerBase
     {
-        private readonly IRoomService _roomService;
+        private readonly IRoomRepository _roomRepo;
 
-        public RoomController(IRoomService roomService)
+        public RoomController(IRoomRepository roomRepo)
         {
-            _roomService = roomService;
+            _roomRepo = roomRepo;
         }
 
         [HttpGet]
-        public IActionResult GetAllRooms()
+        public async Task<IActionResult> GetAllRooms()
         {
-            var rooms = _roomService.GetAllRooms();
-            return Ok(rooms);
+            var rooms = await _roomRepo.GetAllRooms();
+
+            return Ok(rooms.Select(room => room.ToRoomDto()));
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult GetRoomById([FromRoute] int roomId)
+        public async Task<IActionResult> GetRoomByIdAsync([FromRoute] int roomId)
         {
-            var room = _roomService.GetRoomById(roomId);
+            var room = await _roomRepo.GetRoomById(roomId);
 
             if (room == null)
             {
@@ -35,7 +37,7 @@ namespace server.Controllers
             }
             else
             {
-                return Ok(room);
+                return Ok(room.ToRoomDto());
             }
         }
     }
