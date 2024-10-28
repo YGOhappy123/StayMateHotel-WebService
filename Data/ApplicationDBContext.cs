@@ -19,7 +19,7 @@ namespace server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Room>().Property(u => u.Status).HasConversion<string>();
+            modelBuilder.Entity<Room>().Property(r => r.Status).HasConversion<string>();
         }
     }
 }

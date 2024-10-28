@@ -75,13 +75,19 @@ Follow these steps to set up and run the application locally.
     git clone https://github.com/YGOhappy123/StayMateHotel-WebService.git
     ```
 
-2. Navigate to the project directory:
+2. Change project name to `server` to avoid namespace conflicting **(Important)**:
 
     ```bash
-    cd StayMateHotel-WebService
+    mv StayMateHotel-WebService server
     ```
 
-3. Install dependencies:
+3. Navigate to the project directory:
+
+    ```bash
+    cd server
+    ```
+
+4. Install dependencies:
 
     ```bash
     dotnet restore
@@ -210,7 +216,7 @@ Thanks to the following people for contributing to this project ✨:
                 <sub><b>DinhToanIT2003</b></sub>
             </a>
         </td>
-            <td align="center">
+        <td align="center">
             <a href="https://github.com/Nguyen1609">
                 <img 
                     src="https://avatars.githubusercontent.com/u/126648891?v=4"
