@@ -22,7 +22,9 @@ namespace server.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Room>().Property(r => r.Status).HasConversion<string>();
+            modelBuilder.Entity<Account>().Property(acc => acc.Role).HasConversion<string>();
+            modelBuilder.Entity<Admin>().Property(ad => ad.Gender).HasConversion<string>();
+            modelBuilder.Entity<Room>().Property(rm => rm.Status).HasConversion<string>();
         }
     }
 }
