@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using server.Enums;
 
-namespace server.Dtos
+namespace server.Dtos.Room
 {
     public class RoomDto
     {

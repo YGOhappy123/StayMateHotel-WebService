@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces.Repositories;
@@ -10,11 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder
     .Services.AddControllers()
     .AddJsonOptions(options =>
-        options.JsonSerializerOptions.Converters.Add(
-            new System.Text.Json.Serialization.JsonStringEnumConverter()
-        )
-    );
-;
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
