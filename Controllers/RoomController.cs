@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using server.Dtos.Response;
 using server.Interfaces.Repositories;
 using server.Mappers;
+using server.Utilities;
 
 namespace server.Controllers
 {
@@ -23,7 +25,13 @@ namespace server.Controllers
         {
             var rooms = await _roomRepo.GetAllRooms();
 
-            return Ok(rooms.Select(room => room.ToRoomDto()));
+            return Ok(
+                new SuccessResponseDto
+                {
+                    Status = 200,
+                    Data = rooms.Select(room => room.ToRoomDto()),
+                }
+            );
         }
 
         [HttpGet("{roomId}")]
@@ -33,12 +41,12 @@ namespace server.Controllers
 
             if (room == null)
             {
-                return NotFound("ROOM_NOT_FOUND");
+                return NotFound(
+                    new ErrorResponseDto { Status = 404, Message = ErrorMessage.ROOM_NOT_FOUND }
+                );
             }
-            else
-            {
-                return Ok(room.ToRoomDto());
-            }
+
+            return Ok(new SuccessResponseDto { Status = 200, Data = room.ToRoomDto() });
         }
     }
 }
