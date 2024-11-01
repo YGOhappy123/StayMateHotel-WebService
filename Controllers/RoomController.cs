@@ -34,7 +34,7 @@ namespace server.Controllers
             );
         }
 
-        [HttpGet("{roomId}")]
+        [HttpGet("{roomId:int}")]
         public async Task<IActionResult> GetRoomByIdAsync([FromRoute] int roomId)
         {
             var room = await _roomRepo.GetRoomById(roomId);
