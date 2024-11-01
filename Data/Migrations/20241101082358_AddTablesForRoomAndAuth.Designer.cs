@@ -9,11 +9,11 @@ using server.Data;
 
 #nullable disable
 
-namespace server.Migrations
+namespace server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241031083419_ChangeEnumValueToStr")]
-    partial class ChangeEnumValueToStr
+    [Migration("20241101082358_AddTablesForRoomAndAuth")]
+    partial class AddTablesForRoomAndAuth
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
