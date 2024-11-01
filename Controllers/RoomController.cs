@@ -10,6 +10,7 @@ using server.Utilities;
 
 namespace server.Controllers
 {
+    [ApiController]
     [Route("/rooms")]
     public class RoomController : ControllerBase
     {
@@ -25,12 +26,9 @@ namespace server.Controllers
         {
             var rooms = await _roomRepo.GetAllRooms();
 
-            return Ok(
-                new SuccessResponseDto
-                {
-                    Status = 200,
-                    Data = rooms.Select(room => room.ToRoomDto()),
-                }
+            return StatusCode(
+                StatusCodes.Status200OK,
+                new SuccessResponseDto { Data = rooms.Select(room => room.ToRoomDto()) }
             );
         }
 
@@ -41,12 +39,16 @@ namespace server.Controllers
 
             if (room == null)
             {
-                return NotFound(
-                    new ErrorResponseDto { Status = 404, Message = ErrorMessage.ROOM_NOT_FOUND }
+                return StatusCode(
+                    StatusCodes.Status404NotFound,
+                    new ErrorResponseDto { Message = ErrorMessage.ROOM_NOT_FOUND }
                 );
             }
 
-            return Ok(new SuccessResponseDto { Status = 200, Data = room.ToRoomDto() });
+            return StatusCode(
+                StatusCodes.Status200OK,
+                new SuccessResponseDto { Data = room.ToRoomDto() }
+            );
         }
     }
 }

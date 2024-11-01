@@ -7,7 +7,6 @@ namespace server.Dtos.Response
 {
     public class ErrorResponseDto
     {
-        public int Status { get; set; } = 500;
         public string? Message { get; set; }
         public object? Error { get; set; }
     }
