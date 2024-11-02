@@ -19,16 +19,19 @@ namespace server.Services
         private readonly IAccountRepository _accountRepo;
         private readonly IGuestRepository _guestRepo;
         private readonly IAdminRepository _adminRepo;
+        private readonly IJwtService _jwtService;
 
         public AuthService(
             IAccountRepository accountRepo,
             IGuestRepository guestRepo,
-            IAdminRepository adminRepo
+            IAdminRepository adminRepo,
+            IJwtService jwtService
         )
         {
             _accountRepo = accountRepo;
             _guestRepo = guestRepo;
             _adminRepo = adminRepo;
+            _jwtService = jwtService;
         }
 
         public async Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
@@ -53,12 +56,18 @@ namespace server.Services
                 if (existedAccount.Role == UserRole.Guest)
                 {
                     var guestData = await _guestRepo.GetGuestByAccountId(existedAccount.Id);
+
                     return new ServiceResponse<AppUser>
                     {
                         Status = ResStatusCode.OK,
                         Success = true,
                         Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
                         Data = guestData,
+                        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount!),
+                        AccessToken = _jwtService.GenerateAccessToken(
+                            guestData!,
+                            guestData!.Account!.Role
+                        ),
                     };
                 }
                 else
@@ -70,6 +79,11 @@ namespace server.Services
                         Success = true,
                         Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
                         Data = adminData,
+                        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount!),
+                        AccessToken = _jwtService.GenerateAccessToken(
+                            adminData!,
+                            adminData!.Account!.Role
+                        ),
                     };
                 }
             }

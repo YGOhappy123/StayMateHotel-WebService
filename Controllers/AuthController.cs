@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Auth;
 using server.Dtos.Response;
@@ -40,26 +42,29 @@ namespace server.Controllers
                     new SuccessResponseDto
                     {
                         Message = result.Message,
-                        Data = new { User = admin.ToAdminDto() },
-                    }
-                );
-            }
-            else if (result.Data is Guest guest)
-            {
-                return StatusCode(
-                    result.Status,
-                    new SuccessResponseDto
-                    {
-                        Message = result.Message,
-                        Data = new { User = guest.ToGuestDto() },
+                        Data = new
+                        {
+                            User = admin.ToAdminDto(),
+                            result.AccessToken,
+                            result.RefreshToken,
+                        },
                     }
                 );
             }
             else
             {
                 return StatusCode(
-                    ResStatusCode.BAD_REQUEST,
-                    new ErrorResponseDto { Message = result.Message }
+                    result.Status,
+                    new SuccessResponseDto
+                    {
+                        Message = result.Message,
+                        Data = new
+                        {
+                            User = ((Guest)result.Data!).ToGuestDto(),
+                            result.AccessToken,
+                            result.RefreshToken,
+                        },
+                    }
                 );
             }
         }
@@ -82,6 +87,20 @@ namespace server.Controllers
                     Data = new { User = result.Data!.ToGuestDto() },
                 }
             );
+        }
+
+        [Authorize]
+        [HttpGet("test-login")]
+        public IActionResult Test()
+        {
+            return Ok("login content only");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("test-admin")]
+        public IActionResult TestAdmin()
+        {
+            return Ok("admin content only");
         }
     }
 }
