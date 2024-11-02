@@ -8,7 +8,7 @@ namespace server.Models
 {
     public class Admin : AppUser
     {
-        public Gender Gender { get; set; } = Gender.Male;
+        public UserGender Gender { get; set; } = UserGender.Male;
         public int? CreatedById { get; set; }
         public Admin? CreatedBy { get; set; }
         public List<Admin> CreatedAdmins { get; set; } = [];

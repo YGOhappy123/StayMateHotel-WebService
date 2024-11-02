@@ -1,6 +1,6 @@
 namespace server.Enums
 {
-    public enum Gender
+    public enum UserGender
     {
         Male,
         Female,
