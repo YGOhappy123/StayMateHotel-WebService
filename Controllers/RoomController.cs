@@ -27,7 +27,7 @@ namespace server.Controllers
             var rooms = await _roomRepo.GetAllRooms();
 
             return StatusCode(
-                StatusCodes.Status200OK,
+                ResStatusCode.OK,
                 new SuccessResponseDto { Data = rooms.Select(room => room.ToRoomDto()) }
             );
         }
@@ -40,15 +40,12 @@ namespace server.Controllers
             if (room == null)
             {
                 return StatusCode(
-                    StatusCodes.Status404NotFound,
+                    ResStatusCode.NOT_FOUND,
                     new ErrorResponseDto { Message = ErrorMessage.ROOM_NOT_FOUND }
                 );
             }
 
-            return StatusCode(
-                StatusCodes.Status200OK,
-                new SuccessResponseDto { Data = room.ToRoomDto() }
-            );
+            return StatusCode(ResStatusCode.OK, new SuccessResponseDto { Data = room.ToRoomDto() });
         }
     }
 }

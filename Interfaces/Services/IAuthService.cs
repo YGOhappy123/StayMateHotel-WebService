@@ -12,6 +12,6 @@ namespace server.Interfaces.Services
     public interface IAuthService
     {
         Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto);
-        Task<ServiceResponse<GuestDto>> SignUpGuestAccount(SignUpDto signUpDto);
+        Task<ServiceResponse<Guest>> SignUpGuestAccount(SignUpDto signUpDto);
     }
 }

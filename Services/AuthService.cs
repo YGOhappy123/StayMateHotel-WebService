@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using server.Dtos.Account;
 using server.Dtos.Auth;
 using server.Dtos.Response;
+using server.Enums;
 using server.Interfaces.Repositories;
 using server.Interfaces.Services;
 using server.Mappers;
@@ -17,19 +18,64 @@ namespace server.Services
     {
         private readonly IAccountRepository _accountRepo;
         private readonly IGuestRepository _guestRepo;
+        private readonly IAdminRepository _adminRepo;
 
-        public AuthService(IAccountRepository accountRepo, IGuestRepository guestRepo)
+        public AuthService(
+            IAccountRepository accountRepo,
+            IGuestRepository guestRepo,
+            IAdminRepository adminRepo
+        )
         {
             _accountRepo = accountRepo;
             _guestRepo = guestRepo;
+            _adminRepo = adminRepo;
         }
 
-        public Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
+        public async Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
         {
-            throw new NotImplementedException();
+            var existedAccount = await _accountRepo.GetAccountByUsername(signInDto.Username);
+
+            if (
+                existedAccount == null
+                || !existedAccount.IsActive
+                || !BCrypt.Net.BCrypt.Verify(signInDto.Password, existedAccount.Password)
+            )
+            {
+                return new ServiceResponse<AppUser>
+                {
+                    Status = ResStatusCode.UNAUTHORIZED,
+                    Success = false,
+                    Message = ErrorMessage.INVALID_CREDENTIALS,
+                };
+            }
+            else
+            {
+                if (existedAccount.Role == UserRole.Guest)
+                {
+                    var guestData = await _guestRepo.GetGuestByAccountId(existedAccount.Id);
+                    return new ServiceResponse<AppUser>
+                    {
+                        Status = ResStatusCode.OK,
+                        Success = true,
+                        Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
+                        Data = guestData,
+                    };
+                }
+                else
+                {
+                    var adminData = await _adminRepo.GetAdminByAccountId(existedAccount.Id);
+                    return new ServiceResponse<AppUser>
+                    {
+                        Status = ResStatusCode.OK,
+                        Success = true,
+                        Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
+                        Data = adminData,
+                    };
+                }
+            }
         }
 
-        public async Task<ServiceResponse<GuestDto>> SignUpGuestAccount(SignUpDto signUpDto)
+        public async Task<ServiceResponse<Guest>> SignUpGuestAccount(SignUpDto signUpDto)
         {
             var existedAccount = await _accountRepo.GetAccountByUsername(signUpDto.Username);
 
@@ -52,20 +98,21 @@ namespace server.Services
 
                 await _guestRepo.AddGuest(newGuest);
 
-                return new ServiceResponse<GuestDto>
+                return new ServiceResponse<Guest>
                 {
+                    Status = ResStatusCode.CREATED,
                     Success = true,
                     Message = SuccessMessage.SIGN_UP_SUCCESSFULLY,
-                    Data = newGuest.ToGuestDto(),
+                    Data = newGuest,
                 };
             }
             else
             {
                 if (existedAccount.IsActive)
                 {
-                    return new ServiceResponse<GuestDto>
+                    return new ServiceResponse<Guest>
                     {
-                        Status = StatusCodes.Status409Conflict,
+                        Status = ResStatusCode.CONFLICT,
                         Success = false,
                         Message = ErrorMessage.USERNAME_EXISTED,
                     };
@@ -82,12 +129,12 @@ namespace server.Services
 
                     await _guestRepo.UpdateGuest(guestData);
 
-                    return new ServiceResponse<GuestDto>
+                    return new ServiceResponse<Guest>
                     {
-                        Status = StatusCodes.Status200OK,
+                        Status = ResStatusCode.OK,
                         Success = true,
                         Message = SuccessMessage.REACTIVATE_ACCOUNT_SUCCESSFULLY,
-                        Data = guestData.ToGuestDto(),
+                        Data = guestData,
                     };
                 }
             }
