@@ -23,6 +23,11 @@ namespace server.Repositories
             return await _dbContext.Accounts.SingleOrDefaultAsync(acc => acc.Username == username);
         }
 
+        public async Task<Account?> GetAccountById(int accountId)
+        {
+            return await _dbContext.Accounts.SingleOrDefaultAsync(acc => acc.Id == accountId);
+        }
+
         public async Task AddAccount(Account account)
         {
             _dbContext.Accounts.Add(account);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using server.Dtos.Account;
 using server.Dtos.Auth;
@@ -19,16 +20,19 @@ namespace server.Services
         private readonly IAccountRepository _accountRepo;
         private readonly IGuestRepository _guestRepo;
         private readonly IAdminRepository _adminRepo;
+        private readonly IJwtService _jwtService;
 
         public AuthService(
             IAccountRepository accountRepo,
             IGuestRepository guestRepo,
-            IAdminRepository adminRepo
+            IAdminRepository adminRepo,
+            IJwtService jwtService
         )
         {
             _accountRepo = accountRepo;
             _guestRepo = guestRepo;
             _adminRepo = adminRepo;
+            _jwtService = jwtService;
         }
 
         public async Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
@@ -50,28 +54,20 @@ namespace server.Services
             }
             else
             {
-                if (existedAccount.Role == UserRole.Guest)
+                AppUser? userData =
+                    (existedAccount.Role == UserRole.Guest)
+                        ? await _guestRepo.GetGuestByAccountId(existedAccount.Id)
+                        : await _adminRepo.GetAdminByAccountId(existedAccount.Id);
+
+                return new ServiceResponse<AppUser>
                 {
-                    var guestData = await _guestRepo.GetGuestByAccountId(existedAccount.Id);
-                    return new ServiceResponse<AppUser>
-                    {
-                        Status = ResStatusCode.OK,
-                        Success = true,
-                        Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
-                        Data = guestData,
-                    };
-                }
-                else
-                {
-                    var adminData = await _adminRepo.GetAdminByAccountId(existedAccount.Id);
-                    return new ServiceResponse<AppUser>
-                    {
-                        Status = ResStatusCode.OK,
-                        Success = true,
-                        Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
-                        Data = adminData,
-                    };
-                }
+                    Status = ResStatusCode.OK,
+                    Success = true,
+                    Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
+                    Data = userData,
+                    AccessToken = _jwtService.GenerateAccessToken(userData!, existedAccount.Role),
+                    RefreshToken = _jwtService.GenerateRefreshToken(existedAccount!),
+                };
             }
         }
 
@@ -104,6 +100,8 @@ namespace server.Services
                     Success = true,
                     Message = SuccessMessage.SIGN_UP_SUCCESSFULLY,
                     Data = newGuest,
+                    AccessToken = _jwtService.GenerateAccessToken(newGuest!, UserRole.Guest),
+                    RefreshToken = _jwtService.GenerateRefreshToken(newAccount!),
                 };
             }
             else
@@ -135,8 +133,51 @@ namespace server.Services
                         Success = true,
                         Message = SuccessMessage.REACTIVATE_ACCOUNT_SUCCESSFULLY,
                         Data = guestData,
+                        AccessToken = _jwtService.GenerateAccessToken(guestData!, UserRole.Guest),
+                        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount!),
                     };
                 }
+            }
+        }
+
+        public async Task<ServiceResponse<AppUser>> RefreshToken(RefreshTokenDto refreshTokenDto)
+        {
+            if (_jwtService.VerifyRefreshToken(refreshTokenDto.RefreshToken, out var principal))
+            {
+                var accountId = principal!.FindFirst(ClaimTypes.Name)!.Value;
+                var account = await _accountRepo.GetAccountById(Int32.Parse(accountId));
+
+                if (account == null || !account.IsActive)
+                {
+                    return new ServiceResponse<AppUser>
+                    {
+                        Status = ResStatusCode.UNAUTHORIZED,
+                        Success = false,
+                        Message = ErrorMessage.INVALID_CREDENTIALS,
+                    };
+                }
+
+                AppUser? userData =
+                    (account.Role == UserRole.Guest)
+                        ? await _guestRepo.GetGuestByAccountId(account.Id)
+                        : await _adminRepo.GetAdminByAccountId(account.Id);
+
+                return new ServiceResponse<AppUser>
+                {
+                    Status = ResStatusCode.OK,
+                    Success = true,
+                    Message = SuccessMessage.REFRESH_TOKEN_SUCCESSFULLY,
+                    AccessToken = _jwtService.GenerateAccessToken(userData!, account.Role),
+                };
+            }
+            else
+            {
+                return new ServiceResponse<AppUser>
+                {
+                    Status = ResStatusCode.UNAUTHORIZED,
+                    Success = false,
+                    Message = ErrorMessage.INVALID_CREDENTIALS,
+                };
             }
         }
     }

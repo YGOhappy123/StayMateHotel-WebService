@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Auth;
 using server.Dtos.Response;
@@ -33,35 +36,24 @@ namespace server.Controllers
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
             }
 
-            if (result.Data is Admin admin)
-            {
-                return StatusCode(
-                    result.Status,
-                    new SuccessResponseDto
+            object userDto =
+                result.Data is Admin
+                    ? ((Admin)result.Data!).ToAdminDto()
+                    : ((Guest)result.Data!).ToGuestDto();
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Message = result.Message,
+                    Data = new
                     {
-                        Message = result.Message,
-                        Data = new { User = admin.ToAdminDto() },
-                    }
-                );
-            }
-            else if (result.Data is Guest guest)
-            {
-                return StatusCode(
-                    result.Status,
-                    new SuccessResponseDto
-                    {
-                        Message = result.Message,
-                        Data = new { User = guest.ToGuestDto() },
-                    }
-                );
-            }
-            else
-            {
-                return StatusCode(
-                    ResStatusCode.BAD_REQUEST,
-                    new ErrorResponseDto { Message = result.Message }
-                );
-            }
+                        User = userDto,
+                        result.AccessToken,
+                        result.RefreshToken,
+                    },
+                }
+            );
         }
 
         [HttpPost("sign-up")]
@@ -82,6 +74,50 @@ namespace server.Controllers
                     Data = new { User = result.Data!.ToGuestDto() },
                 }
             );
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            var result = await _authService.RefreshToken(refreshTokenDto);
+
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Message = result.Message,
+                    Data = new { result.AccessToken },
+                }
+            );
+        }
+
+        [Authorize]
+        [HttpGet("test-login")]
+        public IActionResult Test()
+        {
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            return Ok(
+                new
+                {
+                    UserId = authUserId,
+                    Role = authUserRole,
+                    Content = "login content only",
+                }
+            );
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("test-admin")]
+        public IActionResult TestAdmin()
+        {
+            return Ok("admin content only");
         }
     }
 }
