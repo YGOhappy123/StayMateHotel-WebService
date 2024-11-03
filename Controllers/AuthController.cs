@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -35,38 +36,24 @@ namespace server.Controllers
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
             }
 
-            if (result.Data is Admin admin)
-            {
-                return StatusCode(
-                    result.Status,
-                    new SuccessResponseDto
+            object userDto =
+                result.Data is Admin
+                    ? ((Admin)result.Data!).ToAdminDto()
+                    : ((Guest)result.Data!).ToGuestDto();
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Message = result.Message,
+                    Data = new
                     {
-                        Message = result.Message,
-                        Data = new
-                        {
-                            User = admin.ToAdminDto(),
-                            result.AccessToken,
-                            result.RefreshToken,
-                        },
-                    }
-                );
-            }
-            else
-            {
-                return StatusCode(
-                    result.Status,
-                    new SuccessResponseDto
-                    {
-                        Message = result.Message,
-                        Data = new
-                        {
-                            User = ((Guest)result.Data!).ToGuestDto(),
-                            result.AccessToken,
-                            result.RefreshToken,
-                        },
-                    }
-                );
-            }
+                        User = userDto,
+                        result.AccessToken,
+                        result.RefreshToken,
+                    },
+                }
+            );
         }
 
         [HttpPost("sign-up")]
@@ -89,11 +76,41 @@ namespace server.Controllers
             );
         }
 
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            var result = await _authService.RefreshToken(refreshTokenDto);
+
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Message = result.Message,
+                    Data = new { result.AccessToken },
+                }
+            );
+        }
+
         [Authorize]
         [HttpGet("test-login")]
         public IActionResult Test()
         {
-            return Ok("login content only");
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            return Ok(
+                new
+                {
+                    UserId = authUserId,
+                    Role = authUserRole,
+                    Content = "login content only",
+                }
+            );
         }
 
         [Authorize(Roles = "Admin")]

@@ -9,6 +9,7 @@ namespace server.Interfaces.Repositories
     public interface IAccountRepository
     {
         Task<Account?> GetAccountByUsername(string username);
+        Task<Account?> GetAccountById(int accountId);
         Task AddAccount(Account account);
         Task UpdateAccount(Account account);
     }

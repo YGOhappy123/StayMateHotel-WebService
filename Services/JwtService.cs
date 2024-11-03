@@ -55,5 +55,38 @@ namespace server.Services
 
             return GenerateToken(claims, "Jwt:RefreshTokenSecret", 60 * 24 * 7);
         }
+
+        public bool VerifyRefreshToken(string refreshToken, out ClaimsPrincipal? principal)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:RefreshTokenSecret"]!);
+
+            try
+            {
+                principal = tokenHandler.ValidateToken(
+                    refreshToken,
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ClockSkew = TimeSpan.Zero,
+                    },
+                    out SecurityToken validatedToken
+                );
+
+                return validatedToken is JwtSecurityToken jwtToken
+                    && jwtToken.Header.Alg.Equals(
+                        SecurityAlgorithms.HmacSha256,
+                        StringComparison.InvariantCultureIgnoreCase
+                    );
+            }
+            catch
+            {
+                principal = null;
+                return false;
+            }
+        }
     }
 }
