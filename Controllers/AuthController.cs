@@ -29,8 +29,15 @@ namespace server.Controllers
         [HttpPost("sign-in")]
         public async Task<IActionResult> SignIn([FromBody] SignInDto signInDto)
         {
-            var result = await _authService.SignIn(signInDto);
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
 
+            var result = await _authService.SignIn(signInDto);
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
@@ -59,8 +66,15 @@ namespace server.Controllers
         [HttpPost("sign-up")]
         public async Task<IActionResult> SignUp([FromBody] SignUpDto signUpDto)
         {
-            var result = await _authService.SignUpGuestAccount(signUpDto);
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
 
+            var result = await _authService.SignUpGuestAccount(signUpDto);
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
@@ -79,8 +93,15 @@ namespace server.Controllers
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
         {
-            var result = await _authService.RefreshToken(refreshTokenDto);
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
 
+            var result = await _authService.RefreshToken(refreshTokenDto);
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
@@ -94,6 +115,15 @@ namespace server.Controllers
                     Data = new { result.AccessToken },
                 }
             );
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(
+            [FromBody] ForgotPasswordDto forgotPasswordDto
+        )
+        {
+            await _authService.ForgotPassword(forgotPasswordDto);
+            return Ok();
         }
 
         [Authorize]

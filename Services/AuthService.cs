@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using server.Dtos.Account;
 using server.Dtos.Auth;
 using server.Dtos.Response;
 using server.Enums;
 using server.Interfaces.Repositories;
 using server.Interfaces.Services;
-using server.Mappers;
 using server.Models;
 using server.Utilities;
 
@@ -21,18 +19,21 @@ namespace server.Services
         private readonly IGuestRepository _guestRepo;
         private readonly IAdminRepository _adminRepo;
         private readonly IJwtService _jwtService;
+        private readonly IMailerService _mailerService;
 
         public AuthService(
             IAccountRepository accountRepo,
             IGuestRepository guestRepo,
             IAdminRepository adminRepo,
-            IJwtService jwtService
+            IJwtService jwtService,
+            IMailerService mailerService
         )
         {
             _accountRepo = accountRepo;
             _guestRepo = guestRepo;
             _adminRepo = adminRepo;
             _jwtService = jwtService;
+            _mailerService = mailerService;
         }
 
         public async Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
@@ -145,7 +146,7 @@ namespace server.Services
             if (_jwtService.VerifyRefreshToken(refreshTokenDto.RefreshToken, out var principal))
             {
                 var accountId = principal!.FindFirst(ClaimTypes.Name)!.Value;
-                var account = await _accountRepo.GetAccountById(Int32.Parse(accountId));
+                var account = await _accountRepo.GetAccountById(int.Parse(accountId));
 
                 if (account == null || !account.IsActive)
                 {
@@ -179,6 +180,15 @@ namespace server.Services
                     Message = ErrorMessage.INVALID_CREDENTIALS,
                 };
             }
+        }
+
+        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            await _mailerService.SendResetPasswordEmail(
+                forgotPasswordDto.Email,
+                "Ha Gia Huy",
+                "http://////"
+            );
         }
     }
 }

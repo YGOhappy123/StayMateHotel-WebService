@@ -14,5 +14,6 @@ namespace server.Interfaces.Services
         Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto);
         Task<ServiceResponse<Guest>> SignUpGuestAccount(SignUpDto signUpDto);
         Task<ServiceResponse<AppUser>> RefreshToken(RefreshTokenDto refreshTokenDto);
+        Task ForgotPassword(ForgotPasswordDto forgotPasswordDto);
     }
 }

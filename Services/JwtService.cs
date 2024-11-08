@@ -15,15 +15,16 @@ namespace server.Services
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
+        private readonly JwtSecurityTokenHandler _tokenHandler;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration, JwtSecurityTokenHandler tokenHandler)
         {
             _configuration = configuration;
+            _tokenHandler = tokenHandler;
         }
 
         private string GenerateToken(Claim[] claims, string tokenKeyPath, int expirationInMins = 60)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration[tokenKeyPath]!);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -34,8 +35,9 @@ namespace server.Services
                     SecurityAlgorithms.HmacSha256Signature
                 ),
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+
+            var token = _tokenHandler.CreateToken(tokenDescriptor);
+            return _tokenHandler.WriteToken(token);
         }
 
         public string GenerateAccessToken(AppUser user, UserRole role)
@@ -56,15 +58,14 @@ namespace server.Services
             return GenerateToken(claims, "Jwt:RefreshTokenSecret", 60 * 24 * 7);
         }
 
-        public bool VerifyRefreshToken(string refreshToken, out ClaimsPrincipal? principal)
+        private ClaimsPrincipal? VerifyToken(string token, string tokenKeyPath)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:RefreshTokenSecret"]!);
+            var key = Encoding.ASCII.GetBytes(_configuration[tokenKeyPath]!);
 
             try
             {
-                principal = tokenHandler.ValidateToken(
-                    refreshToken,
+                var principal = _tokenHandler.ValidateToken(
+                    token,
                     new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
@@ -76,17 +77,18 @@ namespace server.Services
                     out SecurityToken validatedToken
                 );
 
-                return validatedToken is JwtSecurityToken jwtToken
-                    && jwtToken.Header.Alg.Equals(
-                        SecurityAlgorithms.HmacSha256,
-                        StringComparison.InvariantCultureIgnoreCase
-                    );
+                return principal;
             }
             catch
             {
-                principal = null;
-                return false;
+                return null;
             }
+        }
+
+        public bool VerifyRefreshToken(string refreshToken, out ClaimsPrincipal? principal)
+        {
+            principal = VerifyToken(refreshToken, "Jwt:RefreshTokenSecret");
+            return principal != null;
         }
     }
 }

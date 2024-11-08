@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace server.Dtos.Auth
 {
-    public class SignInDto
+    public class ForgotPasswordDto
     {
         [Required]
-        public string Username { get; set; } = string.Empty;
-
-        [Required]
-        public string Password { get; set; } = string.Empty;
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
     }
 }
