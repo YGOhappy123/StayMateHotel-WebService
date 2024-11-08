@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace server.Utilities
 {
@@ -13,5 +14,6 @@ namespace server.Utilities
         public const int UNAUTHORIZED = 401;
         public const int NOT_FOUND = 404;
         public const int CONFLICT = 409;
+        public const int UNPROCESSABLE_ENTITY = 422;
     }
 }
