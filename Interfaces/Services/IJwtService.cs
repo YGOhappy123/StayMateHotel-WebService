@@ -12,6 +12,8 @@ namespace server.Interfaces.Services
     {
         string GenerateAccessToken(AppUser user, UserRole role);
         string GenerateRefreshToken(Account account);
+        string GenerateResetPasswordToken(Guest guest);
         bool VerifyRefreshToken(string refreshToken, out ClaimsPrincipal? principal);
+        bool VerifyResetPasswordToken(string resetPasswordToken, out ClaimsPrincipal? principal);
     }
 }

@@ -10,6 +10,7 @@ namespace server.Interfaces.Repositories
     {
         Task<Guest?> GetGuestById(int guestId);
         Task<Guest?> GetGuestByAccountId(int accountId);
+        Task<Guest?> GetGuestByEmail(string email, bool isAccountIncluded = false);
         Task AddGuest(Guest guest);
         Task UpdateGuest(Guest guest);
     }

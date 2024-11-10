@@ -43,10 +43,7 @@ namespace server.Controllers
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
             }
 
-            object userDto =
-                result.Data is Admin
-                    ? ((Admin)result.Data!).ToAdminDto()
-                    : ((Guest)result.Data!).ToGuestDto();
+            object userDto = result.Data is Admin ? ((Admin)result.Data!).ToAdminDto() : ((Guest)result.Data!).ToGuestDto();
 
             return StatusCode(
                 result.Status,
@@ -82,11 +79,7 @@ namespace server.Controllers
 
             return StatusCode(
                 result.Status,
-                new SuccessResponseDto
-                {
-                    Message = result.Message,
-                    Data = new { User = result.Data!.ToGuestDto() },
-                }
+                new SuccessResponseDto { Message = result.Message, Data = new { User = result.Data!.ToGuestDto() } }
             );
         }
 
@@ -107,47 +100,71 @@ namespace server.Controllers
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
             }
 
-            return StatusCode(
-                result.Status,
-                new SuccessResponseDto
-                {
-                    Message = result.Message,
-                    Data = new { result.AccessToken },
-                }
-            );
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message, Data = new { result.AccessToken } });
         }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(
-            [FromBody] ForgotPasswordDto forgotPasswordDto
-        )
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
         {
-            await _authService.ForgotPassword(forgotPasswordDto);
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var result = await _authService.ForgotPassword(forgotPasswordDto);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
         }
 
-        [Authorize]
-        [HttpGet("test-login")]
-        public IActionResult Test()
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromQuery] string token, [FromBody] ResetPasswordDto resetPasswordDto)
         {
-            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-            var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (string.IsNullOrWhiteSpace(token) || !ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
 
-            return Ok(
-                new
-                {
-                    UserId = authUserId,
-                    Role = authUserRole,
-                    Content = "login content only",
-                }
-            );
+            var result = await _authService.ResetPassword(token, resetPasswordDto);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet("test-admin")]
-        public IActionResult TestAdmin()
-        {
-            return Ok("admin content only");
-        }
+        // [Authorize]
+        // [HttpGet("test-login")]
+        // public IActionResult Test()
+        // {
+        //     var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+        //     var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+
+        //     return Ok(
+        //         new
+        //         {
+        //             UserId = authUserId,
+        //             Role = authUserRole,
+        //             Content = "login content only",
+        //         }
+        //     );
+        // }
+
+        // [Authorize(Roles = "Admin")]
+        // [HttpGet("test-admin")]
+        // public IActionResult TestAdmin()
+        // {
+        //     return Ok("admin content only");
+        // }
     }
 }

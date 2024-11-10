@@ -28,6 +28,18 @@ namespace server.Repositories
             return await _dbContext.Guests.SingleOrDefaultAsync(g => g.AccountId == accountId);
         }
 
+        public async Task<Guest?> GetGuestByEmail(string email, bool isAccountIncluded)
+        {
+            if (isAccountIncluded)
+            {
+                return await _dbContext.Guests.Include(g => g.Account).SingleOrDefaultAsync(g => g.Email == email);
+            }
+            else
+            {
+                return await _dbContext.Guests.SingleOrDefaultAsync(g => g.Email == email);
+            }
+        }
+
         public async Task AddGuest(Guest guest)
         {
             _dbContext.Guests.Add(guest);

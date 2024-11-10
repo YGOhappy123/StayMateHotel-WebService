@@ -11,5 +11,7 @@ namespace server.Utilities
         public const string SIGN_UP_SUCCESSFULLY = "SIGN_UP_SUCCESSFULLY";
         public const string REFRESH_TOKEN_SUCCESSFULLY = "REFRESH_TOKEN_SUCCESSFULLY";
         public const string REACTIVATE_ACCOUNT_SUCCESSFULLY = "REACTIVATE_ACCOUNT_SUCCESSFULLY";
+        public const string RESET_PASSWORD_EMAIL_SENT = "RESET_PASSWORD_EMAIL_SENT";
+        public const string RESET_PASSWORD_SUCCESSFULLY = "RESET_PASSWORD_SUCCESSFULLY";
     }
 }
