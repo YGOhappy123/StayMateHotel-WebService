@@ -30,10 +30,7 @@ namespace server.Services
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddMinutes(expirationInMins),
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature
-                ),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
 
             var token = _tokenHandler.CreateToken(tokenDescriptor);
@@ -42,13 +39,9 @@ namespace server.Services
 
         public string GenerateAccessToken(AppUser user, UserRole role)
         {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, role.ToString()),
-            };
+            var claims = new[] { new Claim(ClaimTypes.Name, user.Id.ToString()), new Claim(ClaimTypes.Role, role.ToString()) };
 
-            return GenerateToken(claims, "Jwt:AccessTokenSecret", 60);
+            return GenerateToken(claims, "Jwt:AccessTokenSecret", 30);
         }
 
         public string GenerateRefreshToken(Account account)
@@ -56,6 +49,13 @@ namespace server.Services
             var claims = new[] { new Claim(ClaimTypes.Name, account.Id.ToString()) };
 
             return GenerateToken(claims, "Jwt:RefreshTokenSecret", 60 * 24 * 7);
+        }
+
+        public string GenerateResetPasswordToken(Guest guest)
+        {
+            var claims = new[] { new Claim(ClaimTypes.Email, guest.Email!.ToString()) };
+
+            return GenerateToken(claims, "Jwt:ResetPasswordTokenSecret", 10);
         }
 
         private ClaimsPrincipal? VerifyToken(string token, string tokenKeyPath)
@@ -88,6 +88,12 @@ namespace server.Services
         public bool VerifyRefreshToken(string refreshToken, out ClaimsPrincipal? principal)
         {
             principal = VerifyToken(refreshToken, "Jwt:RefreshTokenSecret");
+            return principal != null;
+        }
+
+        public bool VerifyResetPasswordToken(string resetPasswordToken, out ClaimsPrincipal? principal)
+        {
+            principal = VerifyToken(resetPasswordToken, "Jwt:ResetPasswordTokenSecret");
             return principal != null;
         }
     }

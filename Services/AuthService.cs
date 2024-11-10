@@ -15,6 +15,7 @@ namespace server.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly IConfiguration _configuration;
         private readonly IAccountRepository _accountRepo;
         private readonly IGuestRepository _guestRepo;
         private readonly IAdminRepository _adminRepo;
@@ -22,6 +23,7 @@ namespace server.Services
         private readonly IMailerService _mailerService;
 
         public AuthService(
+            IConfiguration configuration,
             IAccountRepository accountRepo,
             IGuestRepository guestRepo,
             IAdminRepository adminRepo,
@@ -29,6 +31,7 @@ namespace server.Services
             IMailerService mailerService
         )
         {
+            _configuration = configuration;
             _accountRepo = accountRepo;
             _guestRepo = guestRepo;
             _adminRepo = adminRepo;
@@ -67,7 +70,7 @@ namespace server.Services
                     Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
                     Data = userData,
                     AccessToken = _jwtService.GenerateAccessToken(userData!, existedAccount.Role),
-                    RefreshToken = _jwtService.GenerateRefreshToken(existedAccount!),
+                    RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
                 };
             }
         }
@@ -102,7 +105,7 @@ namespace server.Services
                     Message = SuccessMessage.SIGN_UP_SUCCESSFULLY,
                     Data = newGuest,
                     AccessToken = _jwtService.GenerateAccessToken(newGuest!, UserRole.Guest),
-                    RefreshToken = _jwtService.GenerateRefreshToken(newAccount!),
+                    RefreshToken = _jwtService.GenerateRefreshToken(newAccount),
                 };
             }
             else
@@ -135,13 +138,13 @@ namespace server.Services
                         Message = SuccessMessage.REACTIVATE_ACCOUNT_SUCCESSFULLY,
                         Data = guestData,
                         AccessToken = _jwtService.GenerateAccessToken(guestData!, UserRole.Guest),
-                        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount!),
+                        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
                     };
                 }
             }
         }
 
-        public async Task<ServiceResponse<AppUser>> RefreshToken(RefreshTokenDto refreshTokenDto)
+        public async Task<ServiceResponse> RefreshToken(RefreshTokenDto refreshTokenDto)
         {
             if (_jwtService.VerifyRefreshToken(refreshTokenDto.RefreshToken, out var principal))
             {
@@ -150,7 +153,7 @@ namespace server.Services
 
                 if (account == null || !account.IsActive)
                 {
-                    return new ServiceResponse<AppUser>
+                    return new ServiceResponse
                     {
                         Status = ResStatusCode.UNAUTHORIZED,
                         Success = false,
@@ -163,7 +166,7 @@ namespace server.Services
                         ? await _guestRepo.GetGuestByAccountId(account.Id)
                         : await _adminRepo.GetAdminByAccountId(account.Id);
 
-                return new ServiceResponse<AppUser>
+                return new ServiceResponse
                 {
                     Status = ResStatusCode.OK,
                     Success = true,
@@ -173,7 +176,7 @@ namespace server.Services
             }
             else
             {
-                return new ServiceResponse<AppUser>
+                return new ServiceResponse
                 {
                     Status = ResStatusCode.UNAUTHORIZED,
                     Success = false,
@@ -182,13 +185,72 @@ namespace server.Services
             }
         }
 
-        public async Task ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        public async Task<ServiceResponse> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
-            await _mailerService.SendResetPasswordEmail(
-                forgotPasswordDto.Email,
-                "Ha Gia Huy",
-                "http://////"
-            );
+            var existedGuest = await _guestRepo.GetGuestByEmail(forgotPasswordDto.Email, isAccountIncluded: true);
+
+            if (existedGuest == null || existedGuest.Account == null || !existedGuest.Account.IsActive)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.USER_NOT_FOUND,
+                };
+            }
+            else
+            {
+                await _mailerService.SendResetPasswordEmail(
+                    forgotPasswordDto.Email,
+                    $"{existedGuest.LastName} {existedGuest.FirstName}",
+                    $"{_configuration["Application:ClientUrl"]}?token={_jwtService.GenerateResetPasswordToken(existedGuest)}"
+                );
+
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.OK,
+                    Success = true,
+                    Message = SuccessMessage.RESET_PASSWORD_EMAIL_SENT,
+                };
+            }
+        }
+
+        public async Task<ServiceResponse> ResetPassword(string resetPasswordToken, ResetPasswordDto resetPasswordDto)
+        {
+            if (_jwtService.VerifyResetPasswordToken(resetPasswordToken, out var principal))
+            {
+                var email = principal!.FindFirst(ClaimTypes.Email)!.Value;
+                var account = await _accountRepo.GetGuestAccountByEmail(email);
+
+                if (account == null || !account.IsActive)
+                {
+                    return new ServiceResponse
+                    {
+                        Status = ResStatusCode.UNAUTHORIZED,
+                        Success = false,
+                        Message = ErrorMessage.INVALID_CREDENTIALS,
+                    };
+                }
+
+                account.Password = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.Password);
+                await _accountRepo.UpdateAccount(account);
+
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.OK,
+                    Success = true,
+                    Message = SuccessMessage.RESET_PASSWORD_SUCCESSFULLY,
+                };
+            }
+            else
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.UNAUTHORIZED,
+                    Success = false,
+                    Message = ErrorMessage.INVALID_CREDENTIALS,
+                };
+            }
         }
     }
 }
