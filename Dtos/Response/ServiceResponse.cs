@@ -12,6 +12,7 @@ namespace server.Dtos.Response
         public string Message { get; set; } = string.Empty;
         public string? AccessToken { get; set; }
         public string? RefreshToken { get; set; }
+        public string? ImageUrl { get; set; }
     }
 
     public class ServiceResponse<T> : ServiceResponse

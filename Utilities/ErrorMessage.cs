@@ -12,5 +12,7 @@ namespace server.Utilities
         public const string ROOM_NOT_FOUND = "ROOM_NOT_FOUND";
         public const string INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
         public const string DATA_VALIDATION_FAILED = "DATA_VALIDATION_FAILED";
+        public const string UPLOAD_IMAGE_FAILED = "UPLOAD_IMAGE_FAILED";
+        public const string DELETE_IMAGE_FAILED = "DELETE_IMAGE_FAILED";
     }
 }
