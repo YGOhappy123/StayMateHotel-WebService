@@ -15,5 +15,6 @@ namespace server.Utilities
         public const int NOT_FOUND = 404;
         public const int CONFLICT = 409;
         public const int UNPROCESSABLE_ENTITY = 422;
+        public const int INTERNAL_SERVER_ERROR = 500;
     }
 }

@@ -101,23 +101,21 @@ Before running the project, make sure to set up the database and environment var
 
     In the root directory of your project (at the same level as `Program.cs`), create a `appsettings.Development.json` file.
 
-2. Add the following content to `appsettings.Development.json`:
+2. Populate the environment variables:
 
-    ```json
-    {
-        "ConnectionStrings": {
-            "HotelDbConnectionString": "Data Source=<your_server_name>;Initial Catalog=StayMateHotel;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False"
-        }
-    }
-    ```
+    Copy the structure from `appsettings.Example.json` file into `appsettings.Development.json` and replace the placeholder values with your actual configuration.
 
     **Notes:**
 
-    - You must replace `<your_server_name>` with the actual value of your SQL Server instance.
+    - You must replace `<your_server_name>` with the actual value of your local Microsoft SQL Server instance.
 
     - Ensure that `StayMateHotel` (the database name) is correct, as the application uses migrations that depend on this database.
 
-3. Apply the migrations to create the necessary database tables. Use the following command in the terminal:
+3. For collaborators:
+
+    If you are a collaborator on this project, please contact the project owner to obtain the values for the environment variables.
+
+4. Apply the migrations to create the necessary database tables. Use the following command in the terminal:
 
     ```bash
     dotnet ef database update
@@ -131,7 +129,7 @@ Before running the project, make sure to set up the database and environment var
     dotnet tool install --global dotnet-ef --version 8.0.10
     ```
 
-4. Verify the created database:
+5. Verify the created database:
 
     If you don't see a database name `StayMateHotel` in your SQL Server Management Studio after refreshing, try disconnecting and reconnecting your SQL Server.
 
