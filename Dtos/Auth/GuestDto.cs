@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using server.Dtos.Auth;
 using server.Enums;
 
-namespace server.Dtos.Account
+namespace server.Dtos.Auth
 {
     public class GuestDto
     {

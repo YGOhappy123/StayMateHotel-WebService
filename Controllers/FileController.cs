@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using server.Dtos.File;
 using server.Dtos.Response;
 using server.Interfaces.Services;
-using server.Mappers;
-using server.Models;
 using server.Utilities;
 
 namespace server.Controllers
