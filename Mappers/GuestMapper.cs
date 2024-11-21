@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using server.Dtos.Account;
+using server.Dtos.Auth;
 using server.Models;
 
 namespace server.Mappers

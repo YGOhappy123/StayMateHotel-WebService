@@ -16,6 +16,20 @@ namespace server.Services
         public MailerService(IConfiguration configuration)
         {
             _configuration = configuration;
+
+            Handlebars.RegisterHelper(
+                "eq",
+                (writer, context, parameters) =>
+                {
+                    if (parameters.Length != 2)
+                    {
+                        throw new ArgumentException("The 'eq' helper expects exactly two arguments");
+                    }
+
+                    var isEqual = parameters[0]?.ToString() == parameters[1]?.ToString();
+                    writer.WriteSafeString(isEqual.ToString().ToLower());
+                }
+            );
         }
 
         private async Task SendEmail(string emailTo, string emailSubject, string emailBody)
