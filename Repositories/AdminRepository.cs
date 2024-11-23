@@ -20,12 +20,12 @@ namespace server.Repositories
 
         public async Task<Admin?> GetAdminById(int adminId)
         {
-            return await _dbContext.Admins.SingleOrDefaultAsync(g => g.Id == adminId);
+            return await _dbContext.Admins.SingleOrDefaultAsync(ad => ad.Id == adminId);
         }
 
         public async Task<Admin?> GetAdminByAccountId(int accountId)
         {
-            return await _dbContext.Admins.SingleOrDefaultAsync(g => g.AccountId == accountId);
+            return await _dbContext.Admins.SingleOrDefaultAsync(ad => ad.AccountId == accountId);
         }
 
         public async Task AddAdmin(Admin admin)
