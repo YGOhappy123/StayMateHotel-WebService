@@ -3,8 +3,8 @@ namespace server.Enums
     public enum RoomStatus
     {
         Available,
-        Occupied,
         Reserved,
+        Occupied,
         UnderCleaning,
         OutOfService,
     }

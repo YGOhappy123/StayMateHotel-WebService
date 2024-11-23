@@ -9,11 +9,16 @@ namespace server.Models
     public class Room
     {
         public int Id { get; set; }
-        public string RoomName { get; set; } = string.Empty;
+        public string RoomNumber { get; set; } = string.Empty;
         public RoomStatus Status { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int? FloorId { get; set; }
         public Floor? Floor { get; set; }
-        public int? RoomTypeId { get; set; }
-        public RoomType? RoomType { get; set; }
+        public int? RoomClassId { get; set; }
+        public RoomClass? RoomClass { get; set; }
+        public int? CreatedById { get; set; }
+        public Admin? CreatedBy { get; set; }
+        public List<RoomImage> Images { get; set; } = [];
+        public List<BookingRoom> BookingRooms { get; set; } = [];
     }
 }

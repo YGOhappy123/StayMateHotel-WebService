@@ -9,9 +9,9 @@ namespace server.Dtos.Room
     public class RoomDto
     {
         public int Id { get; set; }
-        public string RoomName { get; set; } = string.Empty;
+        public string RoomNumber { get; set; } = string.Empty;
         public RoomStatus Status { get; set; }
         public int? FloorId { get; set; }
-        public int? RoomTypeId { get; set; }
+        public int? RoomClassId { get; set; }
     }
 }

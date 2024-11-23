@@ -14,10 +14,10 @@ namespace server.Mappers
             return new RoomDto
             {
                 Id = roomModel.Id,
-                RoomName = roomModel.RoomName,
+                RoomNumber = roomModel.RoomNumber,
                 Status = roomModel.Status,
                 FloorId = roomModel.FloorId,
-                RoomTypeId = roomModel.RoomTypeId,
+                RoomClassId = roomModel.RoomClassId,
             };
         }
     }
