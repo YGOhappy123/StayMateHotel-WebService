@@ -143,6 +143,38 @@ namespace server.Controllers
             return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
         }
 
+        [HttpPost("google-auth")]
+        public async Task<IActionResult> GoogleAuthentication([FromBody] GoogleAuthDto googleAuthDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var result = await _authService.GoogleAuthentication(googleAuthDto);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Message = result.Message,
+                    Data = new
+                    {
+                        User = result.Data!.ToGuestDto(),
+                        result.AccessToken,
+                        result.RefreshToken,
+                    },
+                }
+            );
+        }
+
         // [Authorize]
         // [HttpGet("test-login")]
         // public IActionResult Test()

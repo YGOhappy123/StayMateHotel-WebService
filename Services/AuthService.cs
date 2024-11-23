@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using server.Dtos.Auth;
 using server.Dtos.Response;
@@ -78,70 +80,37 @@ namespace server.Services
         public async Task<ServiceResponse<Guest>> SignUpGuestAccount(SignUpDto signUpDto)
         {
             var existedAccount = await _accountRepo.GetAccountByUsername(signUpDto.Username);
-
-            if (existedAccount == null)
+            if (existedAccount != null)
             {
-                var newAccount = new Account
-                {
-                    Username = signUpDto.Username,
-                    Password = BCrypt.Net.BCrypt.HashPassword(signUpDto.Password),
-                };
-
-                await _accountRepo.AddAccount(newAccount);
-
-                var newGuest = new Guest
-                {
-                    FirstName = signUpDto.FirstName,
-                    LastName = signUpDto.LastName,
-                    AccountId = newAccount.Id,
-                };
-
-                await _guestRepo.AddGuest(newGuest);
-
                 return new ServiceResponse<Guest>
                 {
-                    Status = ResStatusCode.CREATED,
-                    Success = true,
-                    Message = SuccessMessage.SIGN_UP_SUCCESSFULLY,
-                    Data = newGuest,
-                    AccessToken = _jwtService.GenerateAccessToken(newGuest!, UserRole.Guest),
-                    RefreshToken = _jwtService.GenerateRefreshToken(newAccount),
+                    Status = ResStatusCode.CONFLICT,
+                    Success = false,
+                    Message = ErrorMessage.USERNAME_EXISTED,
                 };
             }
-            else
+
+            var newAccount = new Account { Username = signUpDto.Username, Password = BCrypt.Net.BCrypt.HashPassword(signUpDto.Password) };
+            await _accountRepo.AddAccount(newAccount);
+
+            var newGuest = new Guest
             {
-                if (existedAccount.IsActive)
-                {
-                    return new ServiceResponse<Guest>
-                    {
-                        Status = ResStatusCode.CONFLICT,
-                        Success = false,
-                        Message = ErrorMessage.USERNAME_EXISTED,
-                    };
-                }
-                else
-                {
-                    existedAccount.IsActive = true;
-                    existedAccount.Password = BCrypt.Net.BCrypt.HashPassword(signUpDto.Password);
-                    await _accountRepo.UpdateAccount(existedAccount);
+                FirstName = signUpDto.FirstName,
+                LastName = signUpDto.LastName,
+                AccountId = newAccount.Id,
+                Avatar = _configuration["Application:DefaultUserAvatar"],
+            };
+            await _guestRepo.AddGuest(newGuest);
 
-                    var guestData = await _guestRepo.GetGuestByAccountId(existedAccount.Id);
-                    guestData!.FirstName = signUpDto.FirstName;
-                    guestData!.LastName = signUpDto.LastName;
-
-                    await _guestRepo.UpdateGuest(guestData);
-
-                    return new ServiceResponse<Guest>
-                    {
-                        Status = ResStatusCode.OK,
-                        Success = true,
-                        Message = SuccessMessage.REACTIVATE_ACCOUNT_SUCCESSFULLY,
-                        Data = guestData,
-                        AccessToken = _jwtService.GenerateAccessToken(guestData!, UserRole.Guest),
-                        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
-                    };
-                }
-            }
+            return new ServiceResponse<Guest>
+            {
+                Status = ResStatusCode.CREATED,
+                Success = true,
+                Message = SuccessMessage.SIGN_UP_SUCCESSFULLY,
+                Data = newGuest,
+                AccessToken = _jwtService.GenerateAccessToken(newGuest!, UserRole.Guest),
+                RefreshToken = _jwtService.GenerateRefreshToken(newAccount),
+            };
         }
 
         public async Task<ServiceResponse> RefreshToken(RefreshTokenDto refreshTokenDto)
@@ -251,6 +220,87 @@ namespace server.Services
                     Message = ErrorMessage.INVALID_CREDENTIALS,
                 };
             }
+        }
+
+        public async Task<ServiceResponse<Guest>> GoogleAuthentication(GoogleAuthDto googleAuthDto)
+        {
+            var googleUserInfo = await FetchGoogleUserInfoAsync(googleAuthDto.GoogleAccessToken);
+            if (googleUserInfo == null || !googleUserInfo.EmailVerified)
+            {
+                return new ServiceResponse<Guest>
+                {
+                    Status = ResStatusCode.UNAUTHORIZED,
+                    Success = false,
+                    Message = ErrorMessage.GOOGLE_AUTH_FAILED,
+                };
+            }
+
+            var existedAccount = await _accountRepo.GetGuestAccountByEmail(googleUserInfo.Email);
+            if (existedAccount == null)
+            {
+                string randomUsername = RandomStringGenerator.GenerateRandomString(16);
+                string randomPassword = RandomStringGenerator.GenerateRandomString(16);
+
+                var newAccount = new Account { Username = randomUsername, Password = BCrypt.Net.BCrypt.HashPassword(randomPassword) };
+                await _accountRepo.AddAccount(newAccount);
+
+                var newGuest = new Guest
+                {
+                    FirstName = googleUserInfo.FirstName,
+                    LastName = googleUserInfo.LastName,
+                    AccountId = newAccount.Id,
+                    Avatar = googleUserInfo.Picture ?? _configuration["Application:DefaultUserAvatar"],
+                    Email = googleUserInfo.Email,
+                };
+                await _guestRepo.AddGuest(newGuest);
+
+                await _mailerService.SendGoogleRegistrationSuccessEmail(
+                    googleUserInfo.Email,
+                    $"{newGuest.LastName} {newGuest.FirstName}",
+                    randomUsername,
+                    randomPassword,
+                    $"{_configuration["Application:ClientUrl"]}/profile/change-password"
+                );
+
+                return new ServiceResponse<Guest>
+                {
+                    Status = ResStatusCode.CREATED,
+                    Success = true,
+                    Message = SuccessMessage.GOOGLE_AUTH_SUCCESSFULLY,
+                    Data = newGuest,
+                    AccessToken = _jwtService.GenerateAccessToken(newGuest!, UserRole.Guest),
+                    RefreshToken = _jwtService.GenerateRefreshToken(newAccount),
+                };
+            }
+            else
+            {
+                var guestData = await _guestRepo.GetGuestByAccountId(existedAccount.Id);
+
+                return new ServiceResponse<Guest>
+                {
+                    Status = ResStatusCode.OK,
+                    Success = true,
+                    Message = SuccessMessage.GOOGLE_AUTH_SUCCESSFULLY,
+                    Data = guestData,
+                    AccessToken = _jwtService.GenerateAccessToken(guestData!, UserRole.Guest),
+                    RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
+                };
+            }
+        }
+
+        private async Task<GoogleUserInfoDto?> FetchGoogleUserInfoAsync(string googleAccessToken)
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", googleAccessToken);
+
+            var response = await httpClient.GetAsync(_configuration["GoogleApi:OAuthEndPoint"]);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<GoogleUserInfoDto>(json);
         }
     }
 }

@@ -31,7 +31,7 @@
                 transform: translate(-50%, -50%);
             }
 
-            span {
+            span, b {
                 color: #ffbe33;
             }
 
@@ -52,22 +52,30 @@
             }
         </style>
     </head>
-
     <body>
         <div class="container">
             <div class="card">
-                <h1 style="margin-top: 0"><span>Xin chào</span> {{FullName}}!</h1>
-                <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn</p>
-                <p>Bạn đã quên mật khẩu?</p>
-
+                <h1 style="margin-top: 0">
+                    <span>Xin chào</span> {{FullName}}!
+                </h1>
+                <p>Bạn đã đăng ký tài khoản thành công thông qua tài khoản Google của bạn</p>
+                <p>Chào mừng bạn đến với Stay Mate Hotel</p>
                 <div class="spacing">
-                    <p>Để đặt lại mật khẩu, hãy ấn vào nút bên dưới 👇🏻</p>
-                    <p>Liên kết này sẽ hết hiệu lực trong 10 phút</p>
-                    <a href="{{ResetPasswordUrl}}" target="_blank">
-                        <button style="cursor: pointer">Đặt lại mật khẩu</button>
+                    <p>Chúng tôi đã cấp cho bạn một tên đăng nhập và mật khẩu ngẫu nhiên</p>
+                    <p>Tuy nhiên, bạn vẫn có thể đăng nhập thông qua tài khoản Google</p>
+                </div>
+                <div class="spacing">
+                    <p>Tên đăng nhập: <b>{{Username}}</b></p>
+                    <p>Mật khẩu: <b>{{Password}}</b></p>
+                </div>
+                <div class="spacing">
+                    <p>Để thay đổi mật khẩu, hãy ấn vào nút bên dưới 👇🏻</p>
+                    <a href="{{ChangePasswordUrl}}" target="_blank">
+                        <button style="cursor: pointer">
+                            Thay đổi mật khẩu
+                        </button>
                     </a>
                 </div>
-
                 <p class="spacing" style="margin-bottom: 0">
                     Cảm ơn bạn đã ủng hộ Stay Mate Hotel, chúc bạn một ngày tốt lành!
                 </p>
