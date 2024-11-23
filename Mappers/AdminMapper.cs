@@ -19,7 +19,6 @@ namespace server.Mappers
                 Email = admin.Email,
                 Avatar = admin.Avatar,
                 CreatedAt = admin.CreatedAt,
-                Gender = admin.Gender.ToString(),
             };
         }
     }

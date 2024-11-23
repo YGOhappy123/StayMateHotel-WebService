@@ -9,5 +9,6 @@ namespace server.Models
     {
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
+        public List<Booking> Bookings { get; set; } = [];
     }
 }

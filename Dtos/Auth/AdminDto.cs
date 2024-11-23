@@ -14,7 +14,6 @@ namespace server.Dtos.Auth
         public string? Email { get; set; }
         public string? Avatar { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public string Gender { get; set; } = UserGender.Male.ToString();
         public string Role { get; } = UserRole.Admin.ToString();
     }
 }
