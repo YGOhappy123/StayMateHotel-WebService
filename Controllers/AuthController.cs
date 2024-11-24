@@ -79,7 +79,16 @@ namespace server.Controllers
 
             return StatusCode(
                 result.Status,
-                new SuccessResponseDto { Message = result.Message, Data = new { User = result.Data!.ToGuestDto() } }
+                new SuccessResponseDto
+                {
+                    Message = result.Message,
+                    Data = new
+                    {
+                        User = result.Data!.ToGuestDto(),
+                        result.AccessToken,
+                        result.RefreshToken,
+                    },
+                }
             );
         }
 
@@ -175,28 +184,28 @@ namespace server.Controllers
             );
         }
 
-        // [Authorize]
-        // [HttpGet("test-login")]
-        // public IActionResult Test()
-        // {
-        //     var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-        //     var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+        [Authorize]
+        [HttpPost("deactivate-account")]
+        public async Task<IActionResult> DeactivateAccount([FromBody] DeactivateAccountDto deactivateAccountDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
 
-        //     return Ok(
-        //         new
-        //         {
-        //             UserId = authUserId,
-        //             Role = authUserRole,
-        //             Content = "login content only",
-        //         }
-        //     );
-        // }
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
 
-        // [Authorize(Roles = "Admin")]
-        // [HttpGet("test-admin")]
-        // public IActionResult TestAdmin()
-        // {
-        //     return Ok("admin content only");
-        // }
+            var result = await _authService.DeactivateAccount(deactivateAccountDto, int.Parse(authUserId!), authUserRole!);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
     }
 }

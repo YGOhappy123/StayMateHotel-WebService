@@ -11,6 +11,7 @@ namespace server.Interfaces.Repositories
         Task<Account?> GetAccountByUsername(string username);
         Task<Account?> GetAccountById(int accountId);
         Task<Account?> GetGuestAccountByEmail(string email);
+        Task<Account?> GetAccountByUserIdAndRole(int userId, string role);
         Task AddAccount(Account account);
         Task UpdateAccount(Account account);
     }

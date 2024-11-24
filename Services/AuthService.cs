@@ -44,37 +44,30 @@ namespace server.Services
         public async Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
         {
             var existedAccount = await _accountRepo.GetAccountByUsername(signInDto.Username);
-
-            if (
-                existedAccount == null
-                || !existedAccount.IsActive
-                || !BCrypt.Net.BCrypt.Verify(signInDto.Password, existedAccount.Password)
-            )
+            if (existedAccount == null || !BCrypt.Net.BCrypt.Verify(signInDto.Password, existedAccount.Password))
             {
                 return new ServiceResponse<AppUser>
                 {
                     Status = ResStatusCode.UNAUTHORIZED,
                     Success = false,
-                    Message = ErrorMessage.INVALID_CREDENTIALS,
+                    Message = ErrorMessage.INCORRECT_USERNAME_OR_PASSWORD,
                 };
             }
-            else
-            {
-                AppUser? userData =
-                    (existedAccount.Role == UserRole.Guest)
-                        ? await _guestRepo.GetGuestByAccountId(existedAccount.Id)
-                        : await _adminRepo.GetAdminByAccountId(existedAccount.Id);
 
-                return new ServiceResponse<AppUser>
-                {
-                    Status = ResStatusCode.OK,
-                    Success = true,
-                    Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
-                    Data = userData,
-                    AccessToken = _jwtService.GenerateAccessToken(userData!, existedAccount.Role),
-                    RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
-                };
-            }
+            AppUser? userData =
+                (existedAccount.Role == UserRole.Guest)
+                    ? await _guestRepo.GetGuestByAccountId(existedAccount.Id)
+                    : await _adminRepo.GetAdminByAccountId(existedAccount.Id);
+
+            return new ServiceResponse<AppUser>
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
+                Data = userData,
+                AccessToken = _jwtService.GenerateAccessToken(userData!, existedAccount.Role),
+                RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
+            };
         }
 
         public async Task<ServiceResponse<Guest>> SignUpGuestAccount(SignUpDto signUpDto)
@@ -120,7 +113,7 @@ namespace server.Services
                 var accountId = principal!.FindFirst(ClaimTypes.Name)!.Value;
                 var account = await _accountRepo.GetAccountById(int.Parse(accountId));
 
-                if (account == null || !account.IsActive)
+                if (account == null)
                 {
                     return new ServiceResponse
                     {
@@ -191,7 +184,7 @@ namespace server.Services
                 var email = principal!.FindFirst(ClaimTypes.Email)!.Value;
                 var account = await _accountRepo.GetGuestAccountByEmail(email);
 
-                if (account == null || !account.IsActive)
+                if (account == null)
                 {
                     return new ServiceResponse
                     {
@@ -301,6 +294,48 @@ namespace server.Services
 
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<GoogleUserInfoDto>(json);
+        }
+
+        public async Task<ServiceResponse> DeactivateAccount(DeactivateAccountDto deactivateAccountDto, int authUserId, string authUserRole)
+        {
+            var targetAccount = await _accountRepo.GetAccountByUserIdAndRole(
+                deactivateAccountDto.TargetUserId,
+                deactivateAccountDto.TargetUserRole
+            );
+            if (targetAccount == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.UNAUTHORIZED,
+                    Success = false,
+                    Message = ErrorMessage.USER_NOT_FOUND,
+                };
+            }
+
+            // Guest: can only deactivate his/her account
+            // Admin: can deactivate any account
+            if (
+                authUserRole == UserRole.Guest.ToString()
+                && (authUserRole != targetAccount.Role.ToString() || authUserId != targetAccount.Id)
+            )
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.FORBIDDEN,
+                    Success = false,
+                    Message = ErrorMessage.NO_PERMISSION,
+                };
+            }
+
+            targetAccount.IsActive = false;
+            await _accountRepo.UpdateAccount(targetAccount);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.DEACTIVATE_ACCOUNT_SUCCESSFULLY,
+            };
         }
     }
 }
