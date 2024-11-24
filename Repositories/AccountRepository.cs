@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Enums;
 using server.Interfaces.Repositories;
 using server.Models;
 
@@ -33,6 +34,22 @@ namespace server.Repositories
             return await _dbContext
                 .Accounts.Where(acc => acc.IsActive && acc.Guest != null && acc.Guest.Email == email)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<Account?> GetAccountByUserIdAndRole(int userId, string role)
+        {
+            if (role == UserRole.Guest.ToString())
+            {
+                return await _dbContext
+                    .Accounts.Where(acc => acc.IsActive && acc.Guest != null && acc.Guest.Id == userId)
+                    .FirstOrDefaultAsync();
+            }
+            else
+            {
+                return await _dbContext
+                    .Accounts.Where(acc => acc.IsActive && acc.Admin != null && acc.Admin.Id == userId)
+                    .FirstOrDefaultAsync();
+            }
         }
 
         public async Task AddAccount(Account account)

@@ -16,5 +16,6 @@ namespace server.Interfaces.Services
         Task<ServiceResponse> ForgotPassword(ForgotPasswordDto forgotPasswordDto);
         Task<ServiceResponse> ResetPassword(string resetPasswordToken, ResetPasswordDto resetPasswordDto);
         Task<ServiceResponse<Guest>> GoogleAuthentication(GoogleAuthDto googleAuthDto);
+        Task<ServiceResponse> DeactivateAccount(DeactivateAccountDto deactivateAccountDto, int authUserId, string authUserRole);
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using server.Dtos.Auth;
 using server.Models;
 
-namespace server.Mappers
+namespace server.Extensions.Mappers
 {
     public static class GuestMapper
     {
