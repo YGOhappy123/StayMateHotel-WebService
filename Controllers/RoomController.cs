@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
+using server.Extensions.Mappers;
 using server.Interfaces.Repositories;
-using server.Mappers;
 using server.Utilities;
 
 namespace server.Controllers
@@ -26,10 +26,7 @@ namespace server.Controllers
         {
             var rooms = await _roomRepo.GetAllRooms();
 
-            return StatusCode(
-                ResStatusCode.OK,
-                new SuccessResponseDto { Data = rooms.Select(room => room.ToRoomDto()) }
-            );
+            return StatusCode(ResStatusCode.OK, new SuccessResponseDto { Data = rooms.Select(room => room.ToRoomDto()) });
         }
 
         [HttpGet("{roomId:int}")]
@@ -39,10 +36,7 @@ namespace server.Controllers
 
             if (room == null)
             {
-                return StatusCode(
-                    ResStatusCode.NOT_FOUND,
-                    new ErrorResponseDto { Message = ErrorMessage.ROOM_NOT_FOUND }
-                );
+                return StatusCode(ResStatusCode.NOT_FOUND, new ErrorResponseDto { Message = ErrorMessage.ROOM_NOT_FOUND });
             }
 
             return StatusCode(ResStatusCode.OK, new SuccessResponseDto { Data = room.ToRoomDto() });

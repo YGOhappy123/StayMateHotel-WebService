@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Auth;
 using server.Dtos.Response;
+using server.Extensions.Mappers;
 using server.Interfaces.Services;
-using server.Mappers;
 using server.Models;
 using server.Utilities;
 
