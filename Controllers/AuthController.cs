@@ -112,6 +112,30 @@ namespace server.Controllers
             return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message, Data = new { result.AccessToken } });
         }
 
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var authUserRole = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            var result = await _authService.ChangePassword(changePasswordDto, int.Parse(authUserId!), authUserRole!);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
         {
