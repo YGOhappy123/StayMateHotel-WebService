@@ -14,12 +14,12 @@ namespace server.Utilities
                 return originalString;
             }
 
-            var capitalizedWords = originalString.Split(' ').Select(word => CapitalizeWord(word)).ToArray();
+            var capitalizedWords = originalString.ToLower().Split(' ').Select(word => word.CapitalizeWord()).ToArray();
 
             return string.Join(" ", capitalizedWords);
         }
 
-        private static string CapitalizeWord(string word)
+        public static string CapitalizeWord(this string word)
         {
             if (string.IsNullOrEmpty(word))
             {

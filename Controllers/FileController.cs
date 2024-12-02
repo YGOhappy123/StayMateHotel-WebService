@@ -24,7 +24,7 @@ namespace server.Controllers
         }
 
         [HttpPost("upload-image")]
-        public async Task<IActionResult> UploadSingleImage([FromForm] UploadImageDto uploadImageDto)
+        public async Task<IActionResult> UploadSingleImage([FromForm] UploadImageDto uploadImageDto, [FromQuery] string? folder)
         {
             if (!ModelState.IsValid)
             {
@@ -34,7 +34,7 @@ namespace server.Controllers
                 );
             }
 
-            var result = await _fileService.UploadImageToCloudinary(uploadImageDto.File, "rooms");
+            var result = await _fileService.UploadImageToCloudinary(uploadImageDto.File, folder);
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });

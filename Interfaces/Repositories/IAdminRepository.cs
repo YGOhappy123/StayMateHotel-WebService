@@ -10,6 +10,7 @@ namespace server.Interfaces.Repositories
     {
         Task<Admin?> GetAdminById(int adminId);
         Task<Admin?> GetAdminByAccountId(int accountId);
+        Task<Admin?> GetAdminByEmail(string email);
         Task AddAdmin(Admin admin);
         Task UpdateAdmin(Admin admin);
     }

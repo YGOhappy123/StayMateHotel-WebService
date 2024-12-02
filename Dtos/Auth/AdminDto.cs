@@ -15,5 +15,7 @@ namespace server.Dtos.Auth
         public string? Avatar { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string Role { get; } = UserRole.Admin.ToString();
+        public int? CreatedById { get; set; }
+        public string? CreatedBy { get; set; }
     }
 }

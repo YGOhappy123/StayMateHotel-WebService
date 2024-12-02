@@ -19,6 +19,8 @@ namespace server.Extensions.Mappers
                 Email = admin.Email,
                 Avatar = admin.Avatar,
                 CreatedAt = admin.CreatedAt,
+                CreatedById = admin.CreatedBy == null ? null : admin.CreatedBy.Id,
+                CreatedBy = admin.CreatedBy == null ? null : $"{admin.CreatedBy.LastName} {admin.CreatedBy.FirstName}",
             };
         }
     }
