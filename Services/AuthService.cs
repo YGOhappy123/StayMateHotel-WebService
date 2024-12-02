@@ -173,8 +173,8 @@ namespace server.Services
 
         public async Task<ServiceResponse> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
-            var existedGuest = await _guestRepo.GetGuestByEmail(forgotPasswordDto.Email, isAccountIncluded: true);
-            if (existedGuest == null || existedGuest.Account == null || !existedGuest.Account.IsActive)
+            var existedGuest = await _guestRepo.GetGuestByEmail(forgotPasswordDto.Email);
+            if (existedGuest == null)
             {
                 return new ServiceResponse
                 {
@@ -187,7 +187,7 @@ namespace server.Services
             await _mailerService.SendResetPasswordEmail(
                 forgotPasswordDto.Email,
                 $"{existedGuest.LastName} {existedGuest.FirstName}",
-                $"{_configuration["Application:ClientUrl"]}?token={_jwtService.GenerateResetPasswordToken(existedGuest)}"
+                $"{_configuration["Application:ClientUrl"]}/auth?type=reset&token={_jwtService.GenerateResetPasswordToken(existedGuest)}"
             );
 
             return new ServiceResponse
@@ -198,9 +198,9 @@ namespace server.Services
             };
         }
 
-        public async Task<ServiceResponse> ResetPassword(string resetPasswordToken, ResetPasswordDto resetPasswordDto)
+        public async Task<ServiceResponse> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
-            if (_jwtService.VerifyResetPasswordToken(resetPasswordToken, out var principal))
+            if (_jwtService.VerifyResetPasswordToken(resetPasswordDto.ResetPasswordToken, out var principal))
             {
                 var email = principal!.FindFirst(ClaimTypes.Email)!.Value;
                 var account = await _accountRepo.GetGuestAccountByEmail(email);

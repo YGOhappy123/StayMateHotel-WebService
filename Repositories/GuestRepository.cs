@@ -20,7 +20,7 @@ namespace server.Repositories
 
         public async Task<Guest?> GetGuestById(int guestId)
         {
-            return await _dbContext.Guests.SingleOrDefaultAsync(g => g.Id == guestId);
+            return await _dbContext.Guests.Include(g => g.Account).Where(g => g.Account!.IsActive && g.Id == guestId).FirstOrDefaultAsync();
         }
 
         public async Task<Guest?> GetGuestByAccountId(int accountId)
@@ -28,16 +28,12 @@ namespace server.Repositories
             return await _dbContext.Guests.SingleOrDefaultAsync(g => g.AccountId == accountId);
         }
 
-        public async Task<Guest?> GetGuestByEmail(string email, bool isAccountIncluded)
+        public async Task<Guest?> GetGuestByEmail(string email)
         {
-            if (isAccountIncluded)
-            {
-                return await _dbContext.Guests.Include(g => g.Account).SingleOrDefaultAsync(g => g.Email == email);
-            }
-            else
-            {
-                return await _dbContext.Guests.SingleOrDefaultAsync(g => g.Email == email);
-            }
+            return await _dbContext
+                .Guests.Include(g => g.Account)
+                .Where(g => g.Account!.IsActive && g.Email == email)
+                .FirstOrDefaultAsync();
         }
 
         public async Task AddGuest(Guest guest)

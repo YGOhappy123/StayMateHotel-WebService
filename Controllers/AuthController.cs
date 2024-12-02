@@ -157,9 +157,9 @@ namespace server.Controllers
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromQuery] string token, [FromBody] ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
-            if (string.IsNullOrWhiteSpace(token) || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return StatusCode(
                     ResStatusCode.UNPROCESSABLE_ENTITY,
@@ -167,7 +167,7 @@ namespace server.Controllers
                 );
             }
 
-            var result = await _authService.ResetPassword(token, resetPasswordDto);
+            var result = await _authService.ResetPassword(resetPasswordDto);
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
