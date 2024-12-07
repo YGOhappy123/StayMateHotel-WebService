@@ -126,11 +126,14 @@ namespace server.Extensions
             services.AddScoped<IGuestRepository, GuestRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
+            services.AddScoped<IRoomClassRepository, RoomClassRepository>();    
+
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IMailerService, MailerService>();
+            services.AddScoped<IRoomClassService, RoomClassService>();
 
             return services;
         }
