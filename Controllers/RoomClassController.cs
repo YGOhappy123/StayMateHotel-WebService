@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using server.Dtos.RoomClass;
 using server.Interfaces.Services;
 using server.Models;
 
@@ -37,28 +38,44 @@ namespace server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] RoomClass roomClass)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _service.AddAsync(roomClass);
-            return CreatedAtAction(nameof(GetById), new { id = roomClass.Id }, roomClass);
-        }
+public async Task<IActionResult> Create([FromBody] CreateUpdateRoomClassDto.CreateRoomClassDto createDto)
+{
+    if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] RoomClass roomClass)
-        {
-            if (id != roomClass.Id) return BadRequest("ID mismatch.");
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+    var roomClass = new RoomClass
+    {
+        ClassName = createDto.ClassName,
+        BasePrice = createDto.BasePrice,
+        Capacity = createDto.Capacity,
+    };
 
-            await _service.UpdateAsync(roomClass);
-            return NoContent();
-        }
+    await _service.AddAsync(roomClass);
+    return CreatedAtAction(nameof(GetById), new { id = roomClass.Id }, roomClass);
+}
 
-        [HttpDelete("{id}")]
+[HttpPut("{id}")]
+public async Task<IActionResult> Update(int id, [FromBody] CreateUpdateRoomClassDto.UpdateRoomClassDto updateDto)
+{
+    if (id != updateDto.Id) return BadRequest("ID mismatch.");
+    if (!ModelState.IsValid) return BadRequest(ModelState);
+
+    var roomClass = new RoomClass
+    {
+        Id = updateDto.Id,
+        ClassName = updateDto.ClassName,
+        BasePrice = updateDto.BasePrice,
+        Capacity = updateDto.Capacity,
+
+    };
+
+    await _service.UpdateAsync(roomClass);
+    return NoContent();
+}
+[HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.DeleteAsync(id);
             return NoContent();
         }
-    }
+}
 }
