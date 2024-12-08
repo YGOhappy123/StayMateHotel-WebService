@@ -9,15 +9,37 @@ namespace server.Extensions.Mappers
 {
     public static class RoomMapper
     {
-        public static RoomDto ToRoomDto(this Room roomModel)
+        public static RoomDto ToRoomDto(this Room room)
         {
             return new RoomDto
             {
-                Id = roomModel.Id,
-                RoomNumber = roomModel.RoomNumber,
-                Status = roomModel.Status,
-                FloorId = roomModel.FloorId,
-                RoomClassId = roomModel.RoomClassId,
+                Id = room.Id,
+                RoomNumber = room.RoomNumber,
+                Status = room.Status.ToString(),
+                FloorId = room?.FloorId,
+                RoomClassId = room?.RoomClassId,
+                Floor = room?.Floor == null ? null : new RoomFloorInfo { Id = room.Floor.Id, FloorNumber = room.Floor.FloorNumber },
+                RoomClass =
+                    room?.RoomClass == null
+                        ? null
+                        : new RoomRoomClassInfo
+                        {
+                            Id = room.RoomClass.Id,
+                            ClassName = room.RoomClass.ClassName,
+                            BasePrice = room.RoomClass.BasePrice,
+                            Capacity = room.RoomClass.Capacity,
+                        },
+                Features =
+                    room?.RoomClass == null
+                        ? null
+                        : room
+                            .RoomClass.RoomClassFeatures.Select(ft => new RoomFeatureInfo
+                            {
+                                Id = ft.FeatureId,
+                                Name = ft.Feature?.Name,
+                                Quantity = ft.Quantity,
+                            })
+                            .ToList(),
             };
         }
     }

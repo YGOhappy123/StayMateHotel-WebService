@@ -18,5 +18,7 @@ namespace server.Dtos.Response
     public class ServiceResponse<T> : ServiceResponse
     {
         public T? Data { get; set; }
+        public int? Total { get; set; }
+        public int? Took { get; set; }
     }
 }
