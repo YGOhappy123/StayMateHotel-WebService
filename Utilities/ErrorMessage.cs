@@ -18,5 +18,7 @@ namespace server.Utilities
         public const string DELETE_IMAGE_FAILED = "DELETE_IMAGE_FAILED";
         public const string NO_PERMISSION = "NO_PERMISSION";
         public const string FLOOR_NOT_FOUND = "FLOOR_NOT_FOUND";
+        public const string DUPLICATE_FLOOR_NAME = "DUPLICATE_FLOOR_NAME";
+        public const string FLOOR_NOT_FOUND_OR_UNAVAILABLE = "FLOOR_NOT_FOUND_OR_UNAVAILABLE";
     }
 }

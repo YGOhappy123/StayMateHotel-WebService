@@ -2,66 +2,145 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using server.Dtos.Floor;
+using server.Dtos.Response;
 using server.Interfaces.Repositories;
 using server.Interfaces.Services;
 using server.Models;
-using server.Repositories;
+using server.Queries;
+using server.Utilities;
 
 namespace server.Services
 {
     public class FloorService : IFloorService
     {
-        private readonly IFloorRepository _floorRepository;
+        private readonly IFloorRepository _floorRepo;
 
-        public FloorService(IFloorRepository floorRepository)
+        public FloorService(IFloorRepository floorRepo)
         {
-            _floorRepository = floorRepository;
+            _floorRepo = floorRepo;
         }
 
-        public async Task<List<Floor>> GetAllFloors()
+        public async Task<ServiceResponse<List<Floor>>> GetAllFloors(BaseQueryObject queryObject)
         {
-            var floors = await _floorRepository.GetAllFloors();
-            return floors;
+            var (floors, total) = await _floorRepo.GetAllFloors(queryObject);
+
+            return new ServiceResponse<List<Floor>>
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Data = floors,
+            };
         }
 
-        public async Task<Floor?> GetFloorById(int id)
+        public async Task<ServiceResponse<Floor>> GetFloorById(int floorId)
         {
-            var floor = await _floorRepository.GetFloorById(id);
+            var floor = await _floorRepo.GetFloorById(floorId);
 
             if (floor == null)
             {
-                throw new KeyNotFoundException($"Floor with ID {id} not found.");
+                return new ServiceResponse<Floor>
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.FLOOR_NOT_FOUND,
+                };
             }
 
-            return floor;
-        }
-
-        public async Task<Floor> AddFloor(Floor floor)
-        {
-            if (floor == null)
+            return new ServiceResponse<Floor>
             {
-                throw new ArgumentNullException(nameof(floor), "Floor cannot be null.");
-            }
-
-            var addedFloor = await _floorRepository.AddFloor(floor);
-            return addedFloor;
+                Status = ResStatusCode.OK,
+                Success = true,
+                Data = floor,
+            };
         }
 
-        public async Task<bool> UpdateFloor(Floor floor)
+        public async Task<ServiceResponse> CreateNewFloor(CreateFloorDto createFloorDto)
         {
-            if (floor == null)
+            var floorsWithSameName = await _floorRepo.GetFloorsByFloorNumber(createFloorDto.FloorNumber);
+
+            if (floorsWithSameName != null && floorsWithSameName.Count > 0)
             {
-                throw new ArgumentNullException(nameof(floor), "Floor cannot be null.");
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.CONFLICT,
+                    Success = false,
+                    Message = ErrorMessage.DUPLICATE_FLOOR_NAME,
+                };
             }
 
-            var result = await _floorRepository.UpdateFloor(floor);
-            return result;
+            var newFloor = new Floor
+            {
+                FloorNumber = createFloorDto.FloorNumber,
+            };
+
+            await _floorRepo.AddFloor(newFloor);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.CREATED,
+                Success = true,
+                Message = SuccessMessage.CREATE_FLOOR_SUCCESSFULLY,
+            };
         }
 
-        public async Task<bool> DeleteFloor(int id)
+        public async Task<ServiceResponse> UpdateFloor(UpdateFloorDto updateFloorDto, int floorId)
         {
-            var result = await _floorRepository.DeleteFloor(id);
-            return result;
+            var targetFloor = await _floorRepo.GetFloorById(floorId);
+            if (targetFloor == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.FLOOR_NOT_FOUND_OR_UNAVAILABLE,
+                };
+            }
+
+            var floorWithSameName = await _floorRepo.GetFloorsByFloorNumber(updateFloorDto.FloorNumber);
+            if (floorWithSameName != null && floorWithSameName.Where(f => f.Id != floorId).ToList().Count > 0)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.CONFLICT,
+                    Success = false,
+                    Message = ErrorMessage.DUPLICATE_FLOOR_NAME,
+                };
+            }
+
+            targetFloor.FloorNumber = updateFloorDto.FloorNumber;
+            await _floorRepo.UpdateFloor(targetFloor);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.UPDATE_FLOOR_SUCCESSFULLY,
+            };
+        }
+
+        public async Task<ServiceResponse> DeleteFloor(int floorId)
+        {
+            var targetFloor = await _floorRepo.GetFloorById(floorId);
+            
+            if (targetFloor == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.FLOOR_NOT_FOUND,
+                };
+            }
+
+            await _floorRepo.DeleteFloor(targetFloor);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.DELETE_FLOOR_SUCCESSFULLY,
+            };
         }
 
     }
