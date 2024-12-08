@@ -68,6 +68,13 @@ namespace server.Data
                 .HasOne(rcf => rcf.Feature)
                 .WithMany(ft => ft.RoomClassFeatures)
                 .HasForeignKey(rcf => rcf.FeatureId);
+
+            modelBuilder
+                .Entity<Room>()
+                .HasMany(rm => rm.Images)
+                .WithOne(ri => ri.Room)
+                .HasForeignKey(ri => ri.RoomId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
