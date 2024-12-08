@@ -17,6 +17,7 @@ namespace server.Dtos.Room
         public RoomFloorInfo? Floor { get; set; }
         public RoomRoomClassInfo? RoomClass { get; set; }
         public List<RoomFeatureInfo>? Features { get; set; } = [];
+        public List<string>? Images { get; set; } = [];
     }
 
     public class RoomFloorInfo

@@ -16,6 +16,7 @@ namespace server.Extensions.Mappers
                 Id = room.Id,
                 RoomNumber = room.RoomNumber,
                 Status = room.Status.ToString(),
+                Images = room.Images.Select(img => img.ImageUrl).ToList(),
                 FloorId = room?.FloorId,
                 RoomClassId = room?.RoomClassId,
                 Floor = room?.Floor == null ? null : new RoomFloorInfo { Id = room.Floor.Id, FloorNumber = room.Floor.FloorNumber },
