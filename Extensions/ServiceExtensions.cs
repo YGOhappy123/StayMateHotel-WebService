@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using server.Data;
 using server.Interfaces.Repositories;
 using server.Interfaces.Services;
+using server.Models;
 using server.Repositories;
 using server.Services;
 
@@ -129,6 +130,7 @@ namespace server.Extensions
             services.AddScoped<IFloorRepository, FloorRepository>();
 
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IMailerService, MailerService>();
