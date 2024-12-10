@@ -1,81 +1,115 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using server.Dtos.Response;
 using server.Dtos.RoomClass;
+using server.Extensions.Mappers;
 using server.Interfaces.Services;
 using server.Models;
+using server.Queries;
+using server.Utilities;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace server.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("/roomClasses")]
     public class RoomClassController : ControllerBase
     {
-        private readonly IRoomClassService _service;
+        private readonly IRoomClassService _roomClassService;
 
-        public RoomClassController(IRoomClassService service)
+        public RoomClassController(IRoomClassService roomClassService)
         {
-            _service = service;
+            _roomClassService = roomClassService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAllRoomClasses([FromQuery] BaseQueryObject queryObject)
         {
-            var roomClasses = await _service.GetAllAsync();
-            return Ok(roomClasses);
+            var result = await _roomClassService.GetAllRoomClasses(queryObject);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Data = result.Data!.Select(rm => rm.ToRoomClassDto()),
+                    Total = result.Total,
+                    Took = result.Took,
+                }
+            );
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("{roomClassId:int}")]
+        public async Task<IActionResult> GetRoomClassById([FromRoute] int roomClassId)
         {
-            var roomClass = await _service.GetByIdAsync(id);
-            if (roomClass is null) return NotFound();
-            return Ok(roomClass);
+            var result = await _roomClassService.GetRoomClassById(roomClassId);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Data = result.Data!.ToRoomClassDto() });
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-public async Task<IActionResult> Create([FromBody] CreateUpdateRoomClassDto.CreateRoomClassDto createDto)
-{
-    if (!ModelState.IsValid) return BadRequest(ModelState);
-
-    var roomClass = new RoomClass
-    {
-        ClassName = createDto.ClassName,
-        BasePrice = createDto.BasePrice,
-        Capacity = createDto.Capacity,
-    };
-
-    await _service.AddAsync(roomClass);
-    return CreatedAtAction(nameof(GetById), new { id = roomClass.Id }, roomClass);
-}
-
-[HttpPut("{id}")]
-public async Task<IActionResult> Update(int id, [FromBody] CreateUpdateRoomClassDto.UpdateRoomClassDto updateDto)
-{
-    if (id != updateDto.Id) return BadRequest("ID mismatch.");
-    if (!ModelState.IsValid) return BadRequest(ModelState);
-
-    var roomClass = new RoomClass
-    {
-        Id = updateDto.Id,
-        ClassName = updateDto.ClassName,
-        BasePrice = updateDto.BasePrice,
-        Capacity = updateDto.Capacity,
-
-    };
-
-    await _service.UpdateAsync(roomClass);
-    return NoContent();
-}
-[HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> CreateNewRoomClass([FromBody] CreateUpdateRoomClassDto createRoomClassDto)
         {
-            await _service.DeleteAsync(id);
-            return NoContent();
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            var result = await _roomClassService.CreateNewRoomClass(createRoomClassDto, int.Parse(authUserId!));
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
         }
-}
+
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("{roomClassId:int}")]
+        public async Task<IActionResult> UpdateRoomClass([FromRoute] int roomClassId, [FromBody] CreateUpdateRoomClassDto updateRoomClassDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var result = await _roomClassService.UpdateRoomClass(roomClassId, updateRoomClassDto);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{roomClassId:int}")]
+        public async Task<IActionResult> DeleteRoomClass([FromRoute] int roomClassId)
+        {
+            var result = await _roomClassService.DeleteRoomClass(roomClassId);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+    }
 }
