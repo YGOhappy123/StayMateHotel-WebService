@@ -20,5 +20,8 @@ namespace server.Utilities
         public const string DELETE_ROOM_SUCCESSFULLY = "DELETE_ROOM_SUCCESSFULLY";
         public const string UPLOAD_IMAGE_SUCCESSFULLY = "UPLOAD_IMAGE_SUCCESSFULLY";
         public const string DELETE_IMAGE_SUCCESSFULLY = "DELETE_IMAGE_SUCCESSFULLY";
+        public const string CREATE_FLOOR_SUCCESSFULLY = "CREATE_FLOOR_SUCCESSFULLY";
+        public const string UPDATE_FLOOR_SUCCESSFULLY = "UPDATE_FLOOR_SUCCESSFULLY";
+        public const string DELETE_FLOOR_SUCCESSFULLY = "DELETE_FLOOR_SUCCESSFULLY";
     }
 }
