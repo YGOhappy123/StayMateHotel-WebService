@@ -13,8 +13,8 @@ namespace server.Interfaces.Services
     {
         Task<ServiceResponse<List<Floor>>> GetAllFloors(BaseQueryObject queryObject);
         Task<ServiceResponse<Floor>> GetFloorById(int orderId);
-        Task<ServiceResponse> CreateNewFloor(CreateFloorDto createFloorDto);
-        Task<ServiceResponse> UpdateFloor(UpdateFloorDto updateFloorDto, int floorId);
+        Task<ServiceResponse> CreateNewFloor(CreateUpdateFloorDto createFloorDto, int adminId);
+        Task<ServiceResponse> UpdateFloor(int floorId, CreateUpdateFloorDto updateFloorDto);
         Task<ServiceResponse> DeleteFloor(int floorId);
     }
 }

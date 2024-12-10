@@ -32,18 +32,16 @@ namespace server.Repositories
                     switch (filter.Key)
                     {
                         case "startTime":
-                            var startTime = DateTime.Parse(value);
-                            query = query.Where(m => m.CreatedAt >= startTime);
+                            query = query.Where(f => f.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            var endTime = DateTime.Parse(value);
-                            query = query.Where(m => m.CreatedAt <= endTime);
+                            query = query.Where(f => f.CreatedAt <= DateTime.Parse(value));
                             break;
                         case "floorNumber":
-                            query = query.Where(m => m.FloorNumber.Contains(value));
+                            query = query.Where(f => f.FloorNumber.Contains(value));
                             break;
                         default:
-                            query = query.Where(m => EF.Property<string>(m, filter.Key.CapitalizeWord()) == value);
+                            query = query.Where(f => EF.Property<string>(f, filter.Key.CapitalizeWord()) == value);
                             break;
                     }
                 }
@@ -58,8 +56,8 @@ namespace server.Repositories
             {
                 query =
                     order.Value == "ASC"
-                        ? query.OrderBy(m => EF.Property<object>(m, order.Key.CapitalizeWord()))
-                        : query.OrderByDescending(m => EF.Property<object>(m, order.Key.CapitalizeWord()));
+                        ? query.OrderBy(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()))
+                        : query.OrderByDescending(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()));
             }
 
             return query;
@@ -67,7 +65,7 @@ namespace server.Repositories
 
         public async Task<(List<Floor>, int)> GetAllFloors(BaseQueryObject queryObject)
         {
-            var query = _dbContext.Floors.AsQueryable();
+            var query = _dbContext.Floors.Include(f => f.Rooms).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(queryObject.Filter))
             {
@@ -90,21 +88,21 @@ namespace server.Repositories
                 query = query.Take(queryObject.Limit.Value);
 
             var floors = await query.ToListAsync();
-            
+
             return (floors, total);
         }
 
         public async Task<Floor?> GetFloorById(int floorId)
         {
-            return await _dbContext.Floors.Where(f => f.Id == floorId).FirstOrDefaultAsync();
+            return await _dbContext.Floors.Include(f => f.Rooms).Where(f => f.Id == floorId).FirstOrDefaultAsync();
         }
 
-        public async Task<List<Floor>> GetFloorsByFloorNumber(string floorNumber)
+        public async Task<Floor?> GetFloorsByFloorNumber(string floorNumber)
         {
-            return await _dbContext.Floors.Where(f => f.FloorNumber == floorNumber).ToListAsync();
+            return await _dbContext.Floors.Where(f => f.FloorNumber == floorNumber).FirstOrDefaultAsync();
         }
 
-        public async Task AddFloor(Floor floor)
+        public async Task CreateNewFloor(Floor floor)
         {
             _dbContext.Floors.Add(floor);
             await _dbContext.SaveChangesAsync();
@@ -120,6 +118,11 @@ namespace server.Repositories
         {
             _dbContext.Floors.Remove(floor);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> CountRoomsInFloor(int floorId)
+        {
+            return await _dbContext.Rooms.Where(rif => rif.FloorId == floorId).CountAsync();
         }
     }
 }

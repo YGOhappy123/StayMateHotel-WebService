@@ -9,12 +9,13 @@ namespace server.Extensions.Mappers
 {
     public static class FloorMapper
     {
-        public static FloorDto ToFloorDto(this Floor floorModel)
+        public static FloorDto ToFloorDto(this Floor floor)
         {
             return new FloorDto
             {
-                Id = floorModel.Id,
-                FloorNumber = floorModel.FloorNumber,
+                Id = floor.Id,
+                FloorNumber = floor.FloorNumber,
+                Rooms = floor.Rooms.Select(r => r.RoomNumber).ToList(),
             };
         }
     }

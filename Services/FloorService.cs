@@ -30,13 +30,14 @@ namespace server.Services
                 Status = ResStatusCode.OK,
                 Success = true,
                 Data = floors,
+                Total = total,
+                Took = floors.Count,
             };
         }
 
         public async Task<ServiceResponse<Floor>> GetFloorById(int floorId)
         {
             var floor = await _floorRepo.GetFloorById(floorId);
-
             if (floor == null)
             {
                 return new ServiceResponse<Floor>
@@ -55,26 +56,23 @@ namespace server.Services
             };
         }
 
-        public async Task<ServiceResponse> CreateNewFloor(CreateFloorDto createFloorDto)
+        public async Task<ServiceResponse> CreateNewFloor(CreateUpdateFloorDto createFloorDto, int adminId)
         {
             var floorsWithSameName = await _floorRepo.GetFloorsByFloorNumber(createFloorDto.FloorNumber);
 
-            if (floorsWithSameName != null && floorsWithSameName.Count > 0)
+            if (floorsWithSameName != null)
             {
                 return new ServiceResponse
                 {
                     Status = ResStatusCode.CONFLICT,
                     Success = false,
-                    Message = ErrorMessage.DUPLICATE_FLOOR_NAME,
+                    Message = ErrorMessage.DUPLICATE_FLOOR_NUMBER,
                 };
             }
 
-            var newFloor = new Floor
-            {
-                FloorNumber = createFloorDto.FloorNumber,
-            };
+            var newFloor = new Floor { FloorNumber = createFloorDto.FloorNumber, CreatedById = adminId };
 
-            await _floorRepo.AddFloor(newFloor);
+            await _floorRepo.CreateNewFloor(newFloor);
 
             return new ServiceResponse
             {
@@ -84,7 +82,7 @@ namespace server.Services
             };
         }
 
-        public async Task<ServiceResponse> UpdateFloor(UpdateFloorDto updateFloorDto, int floorId)
+        public async Task<ServiceResponse> UpdateFloor(int floorId, CreateUpdateFloorDto updateFloorDto)
         {
             var targetFloor = await _floorRepo.GetFloorById(floorId);
             if (targetFloor == null)
@@ -93,24 +91,24 @@ namespace server.Services
                 {
                     Status = ResStatusCode.NOT_FOUND,
                     Success = false,
-                    Message = ErrorMessage.FLOOR_NOT_FOUND_OR_UNAVAILABLE,
+                    Message = ErrorMessage.FLOOR_NOT_FOUND,
                 };
             }
 
-            var floorWithSameName = await _floorRepo.GetFloorsByFloorNumber(updateFloorDto.FloorNumber);
-            if (floorWithSameName != null && floorWithSameName.Where(f => f.Id != floorId).ToList().Count > 0)
+            var floorWithSameNumber = await _floorRepo.GetFloorsByFloorNumber(updateFloorDto.FloorNumber);
+            if (floorWithSameNumber != null && floorWithSameNumber.Id != floorId)
             {
                 return new ServiceResponse
                 {
                     Status = ResStatusCode.CONFLICT,
                     Success = false,
-                    Message = ErrorMessage.DUPLICATE_FLOOR_NAME,
+                    Message = ErrorMessage.DUPLICATE_FLOOR_NUMBER,
                 };
             }
 
             targetFloor.FloorNumber = updateFloorDto.FloorNumber;
-            await _floorRepo.UpdateFloor(targetFloor);
 
+            await _floorRepo.UpdateFloor(targetFloor);
             return new ServiceResponse
             {
                 Status = ResStatusCode.OK,
@@ -122,7 +120,6 @@ namespace server.Services
         public async Task<ServiceResponse> DeleteFloor(int floorId)
         {
             var targetFloor = await _floorRepo.GetFloorById(floorId);
-            
             if (targetFloor == null)
             {
                 return new ServiceResponse
@@ -133,8 +130,18 @@ namespace server.Services
                 };
             }
 
-            await _floorRepo.DeleteFloor(targetFloor);
+            var roomCount = await _floorRepo.CountRoomsInFloor(floorId);
+            if (roomCount > 0)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.BAD_REQUEST,
+                    Success = false,
+                    Message = ErrorMessage.FLOOR_CANNOT_BE_DELETED,
+                };
+            }
 
+            await _floorRepo.DeleteFloor(targetFloor);
             return new ServiceResponse
             {
                 Status = ResStatusCode.OK,
@@ -142,6 +149,5 @@ namespace server.Services
                 Message = SuccessMessage.DELETE_FLOOR_SUCCESSFULLY,
             };
         }
-
     }
 }

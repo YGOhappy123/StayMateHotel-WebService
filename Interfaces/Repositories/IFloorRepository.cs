@@ -11,9 +11,10 @@ namespace server.Interfaces.Repositories
     {
         Task<(List<Floor>, int)> GetAllFloors(BaseQueryObject queryObject);
         Task<Floor?> GetFloorById(int floorId);
-        Task<List<Floor>> GetFloorsByFloorNumber(string floorNumber);
-        Task AddFloor(Floor floor);
+        Task<Floor?> GetFloorsByFloorNumber(string floorNumber);
+        Task CreateNewFloor(Floor floor);
         Task UpdateFloor(Floor floor);
         Task DeleteFloor(Floor floor);
+        Task<int> CountRoomsInFloor(int floorId);
     }
 }
