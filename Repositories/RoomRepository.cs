@@ -89,6 +89,7 @@ namespace server.Repositories
         {
             var query = _dbContext
                 .Rooms.Include(rm => rm.Floor)
+                .Include(rm => rm.CreatedBy)
                 .Include(rm => rm.Images)
                 .Include(rm => rm.RoomClass)
                 .ThenInclude(rc => rc!.RoomClassFeatures)
@@ -124,6 +125,7 @@ namespace server.Repositories
         {
             return await _dbContext
                 .Rooms.Include(rm => rm.Floor)
+                .Include(rm => rm.CreatedBy)
                 .Include(rm => rm.Images)
                 .Include(rm => rm.RoomClass)
                 .ThenInclude(rc => rc!.RoomClassFeatures)
