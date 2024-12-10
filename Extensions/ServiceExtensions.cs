@@ -127,15 +127,25 @@ namespace server.Extensions
             services.AddScoped<IGuestRepository, GuestRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
+//<<<<<<< HEAD
+//            services.AddScoped<IFeatureRepository, FeatureRepository>();
+//            services.AddScoped<IRoomClassFeatureRepository, RoomClassFeatureRepository>();
+//=======
             services.AddScoped<IRoomClassRepository, RoomClassRepository>();    
             services.AddScoped<IFloorRepository, FloorRepository>();
+//>>>>>>> ee47800ab1adf9e7aa82f961e9cfdb03f9602b90
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IMailerService, MailerService>();
+//<<<<<<< HEAD
+//            services.AddScoped<IFeatureService, FeatureService>();
+
+//=======
         
+//>>>>>>> ee47800ab1adf9e7aa82f961e9cfdb03f9602b90
             return services;
         }
     }
