@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using server.Dtos.Auth;
 using server.Enums;
 using server.Models;
 
@@ -12,10 +13,13 @@ namespace server.Dtos.Room
         public int Id { get; set; }
         public string RoomNumber { get; set; } = string.Empty;
         public string Status { get; set; } = RoomStatus.Available.ToString();
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int? FloorId { get; set; }
         public int? RoomClassId { get; set; }
+        public int? CreatedById { get; set; }
         public RoomFloorInfo? Floor { get; set; }
         public RoomRoomClassInfo? RoomClass { get; set; }
+        public UserInfo? CreatedBy { get; set; }
         public List<RoomFeatureInfo>? Features { get; set; } = [];
         public List<string>? Images { get; set; } = [];
     }
@@ -39,5 +43,13 @@ namespace server.Dtos.Room
         public int? Id { get; set; }
         public string? Name { get; set; }
         public int Quantity { get; set; }
+    }
+
+    public class UserInfo
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string? Email { get; set; }
     }
 }

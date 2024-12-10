@@ -16,9 +16,20 @@ namespace server.Extensions.Mappers
                 Id = room.Id,
                 RoomNumber = room.RoomNumber,
                 Status = room.Status.ToString(),
+                CreatedAt = room.CreatedAt,
                 Images = room.Images.Select(img => img.ImageUrl).ToList(),
                 FloorId = room?.FloorId,
                 RoomClassId = room?.RoomClassId,
+                CreatedBy =
+                    room?.CreatedBy == null
+                        ? null
+                        : new UserInfo
+                        {
+                            Id = room.CreatedBy.Id,
+                            FirstName = room.CreatedBy.FirstName,
+                            LastName = room.CreatedBy.LastName,
+                            Email = room.CreatedBy.Email,
+                        },
                 Floor = room?.Floor == null ? null : new RoomFloorInfo { Id = room.Floor.Id, FloorNumber = room.Floor.FloorNumber },
                 RoomClass =
                     room?.RoomClass == null
