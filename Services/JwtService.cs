@@ -39,6 +39,16 @@ namespace server.Services
 
         public string GenerateAccessToken(AppUser user, UserRole role)
         {
+            //if (user == null || role == null)
+            //{
+            //    throw new ArgumentNullException("User or Role cannot be null");
+            //}
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user), "User cannot be null");
+            }
+
             var claims = new[] { new Claim(ClaimTypes.Name, user.Id.ToString()), new Claim(ClaimTypes.Role, role.ToString()) };
 
             return GenerateToken(claims, "Jwt:AccessTokenSecret", 30);

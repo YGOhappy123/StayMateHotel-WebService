@@ -21,5 +21,7 @@ namespace server.Utilities
         public const string UPLOAD_IMAGE_FAILED = "UPLOAD_IMAGE_FAILED";
         public const string DELETE_IMAGE_FAILED = "DELETE_IMAGE_FAILED";
         public const string NO_PERMISSION = "NO_PERMISSION";
+        public const string FEATURE_NOT_FOUND = "FEATURE_NOT_FOUND";
+        public const string DUPLICATE_FEATURE_NAME = "DUPLICATE_FEATURE_NAME";
     }
 }

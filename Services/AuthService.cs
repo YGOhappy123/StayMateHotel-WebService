@@ -69,6 +69,44 @@ namespace server.Services
                 RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
             };
         }
+        //public async Task<ServiceResponse<AppUser>> SignIn(SignInDto signInDto)
+        //{
+        //    var existedAccount = await _accountRepo.GetAccountByUsername(signInDto.Username);
+        //    if (existedAccount == null || !BCrypt.Net.BCrypt.Verify(signInDto.Password, existedAccount.Password))
+        //    {
+        //        return new ServiceResponse<AppUser>
+        //        {
+        //            Status = ResStatusCode.UNAUTHORIZED,
+        //            Success = false,
+        //            Message = ErrorMessage.INCORRECT_USERNAME_OR_PASSWORD,
+        //        };
+        //    }
+
+        //    AppUser? userData =
+        //        (existedAccount.Role == UserRole.Guest)
+        //            ? await _guestRepo.GetGuestByAccountId(existedAccount.Id)
+        //            : await _adminRepo.GetAdminByAccountId(existedAccount.Id);
+
+        //    if (userData == null)
+        //    {
+        //        return new ServiceResponse<AppUser>
+        //        {
+        //            Status = ResStatusCode.NOT_FOUND,
+        //            Success = false,
+        //            Message = ErrorMessage.USER_NOT_FOUND,
+        //        };
+        //    }
+
+        //    return new ServiceResponse<AppUser>
+        //    {
+        //        Status = ResStatusCode.OK,
+        //        Success = true,
+        //        Message = SuccessMessage.SIGN_IN_SUCCESSFULLY,
+        //        Data = userData,
+        //        AccessToken = _jwtService.GenerateAccessToken(userData, existedAccount.Role),
+        //        RefreshToken = _jwtService.GenerateRefreshToken(existedAccount),
+        //    };
+        //}
 
         public async Task<ServiceResponse<Guest>> SignUpGuestAccount(SignUpDto signUpDto)
         {
