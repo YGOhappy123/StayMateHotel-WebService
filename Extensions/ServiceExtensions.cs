@@ -127,6 +127,7 @@ namespace server.Extensions
             services.AddScoped<IGuestRepository, GuestRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
+            services.AddScoped<IRoomClassRepository, RoomClassRepository>();    
             services.AddScoped<IFloorRepository, FloorRepository>();
 
             services.AddScoped<IAuthService, AuthService>();
@@ -134,8 +135,7 @@ namespace server.Extensions
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IMailerService, MailerService>();
-            services.AddScoped<IFloorService, FloorService>();
-
+        
             return services;
         }
     }

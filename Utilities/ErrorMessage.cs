@@ -21,8 +21,12 @@ namespace server.Utilities
         public const string UPLOAD_IMAGE_FAILED = "UPLOAD_IMAGE_FAILED";
         public const string DELETE_IMAGE_FAILED = "DELETE_IMAGE_FAILED";
         public const string NO_PERMISSION = "NO_PERMISSION";
+        public const string ROOM_CLASS_NOT_FOUND = "ROOM_CLASS_NOT_FOUND";
+        public const string DUPLICATE_ROOM_CLASS_NAME = "DUPLICATE_ROOM_CLASS_NAME";
+        public const string ROOM_CLASS_CANNOT_BE_DELETED = "ROOM_CLASS_CANNOT_BE_DELETED";
         public const string FLOOR_NOT_FOUND = "FLOOR_NOT_FOUND";
         public const string DUPLICATE_FLOOR_NUMBER = "DUPLICATE_FLOOR_NUMBER";
         public const string FLOOR_CANNOT_BE_DELETED = "FLOOR_CANNOT_BE_DELETED";
+    
     }
 }
