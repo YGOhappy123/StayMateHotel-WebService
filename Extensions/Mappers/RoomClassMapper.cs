@@ -19,6 +19,7 @@ namespace server.Extensions.Mappers{
             BasePrice = roomclassModel.BasePrice,
             Capacity = roomclassModel.Capacity,
             CreatedAt = roomclassModel.CreatedAt,
+            CreateById = roomclassModel.CreatedById,
             CreatedBy = roomclassModel?.CreatedBy == null
                         ? null
                         : new UserInfo

@@ -13,6 +13,7 @@ namespace server.Dtos.RoomClass
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; }
         public UserInfo? CreatedBy { get; set; }
+        public int? CreateById { get; set; }    
 
     }
 
