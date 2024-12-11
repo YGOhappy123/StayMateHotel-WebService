@@ -82,7 +82,7 @@ namespace server.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPut("{floorId:int}")]
+        [HttpPatch("{floorId:int}")]
         public async Task<IActionResult> UpdateFloor([FromRoute] int floorId, [FromBody] CreateUpdateFloorDto updateFloorDto)
         {
             // Kiểm tra dữ liệu đầu vào

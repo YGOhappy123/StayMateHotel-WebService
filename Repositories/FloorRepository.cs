@@ -65,7 +65,7 @@ namespace server.Repositories
 
         public async Task<(List<Floor>, int)> GetAllFloors(BaseQueryObject queryObject)
         {
-            var query = _dbContext.Floors.Include(f => f.Rooms).AsQueryable();
+            var query = _dbContext.Floors.Include(f => f.Rooms).Include(f => f.CreatedBy).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(queryObject.Filter))
             {
@@ -94,7 +94,11 @@ namespace server.Repositories
 
         public async Task<Floor?> GetFloorById(int floorId)
         {
-            return await _dbContext.Floors.Include(f => f.Rooms).Where(f => f.Id == floorId).FirstOrDefaultAsync();
+            return await _dbContext
+                .Floors.Include(f => f.Rooms)
+                .Include(f => f.CreatedBy)
+                .Where(f => f.Id == floorId)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Floor?> GetFloorsByFloorNumber(string floorNumber)
