@@ -90,6 +90,7 @@ namespace server.Repositories
             var query = _dbContext
                 .RoomClasses
                 .Include(rmc => rmc.Rooms)
+                .Include(rmc => rmc.CreatedBy)
                 .Include(rmc => rmc.RoomClassFeatures)
                 .ThenInclude(rcf => rcf.Feature)
                 .AsQueryable();
