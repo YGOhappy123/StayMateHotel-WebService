@@ -106,7 +106,7 @@ namespace server.Services
             }
 
             var roomClassWithSameName = await _roomClassRepo.GetRoomClassByName(updateRoomClassDto.ClassName);
-            if (roomClassWithSameName != null)
+            if (roomClassWithSameName != null && roomClassWithSameName.Id != roomClassId)
             {
                 return new ServiceResponse
                 {

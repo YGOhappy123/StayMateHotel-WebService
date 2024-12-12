@@ -12,6 +12,16 @@ namespace server.Dtos.RoomClass
         public decimal BasePrice { get; set; }
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int? CreatedById { get; set; }
+        public UserInfo? CreatedBy { get; set; }
+        public int? CreateById { get; set; }    
+
+    }
+
+    public class UserInfo
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string? Email { get; set; }
     }
 }
