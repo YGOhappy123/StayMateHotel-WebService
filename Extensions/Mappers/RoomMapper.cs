@@ -47,7 +47,7 @@ namespace server.Extensions.Mappers
                         : room
                             .RoomClass.RoomClassFeatures.Select(ft => new RoomFeatureInfo
                             {
-                                Id = ft.FeatureId,
+                                FeatureId = ft.FeatureId,
                                 Name = ft.Feature?.Name,
                                 Quantity = ft.Quantity,
                             })

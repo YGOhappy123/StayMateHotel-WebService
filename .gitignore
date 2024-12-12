@@ -1,10 +1,11 @@
-# Ignore Visual Studio Code settings and extensions
+# Ignore Visual Studio and Visual Studio Code settings and extensions
 .vscode/
 .vscode/settings.json
 .vscode/tasks.json
 .vscode/launch.json
 .vscode/extensions.json
 .vs/
+
 # Ignore .NET build outputs
 bin/
 obj/
