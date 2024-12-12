@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using server.Dtos.Response;
 using server.Dtos.RoomClass;
 using server.Interfaces.Repositories;
@@ -5,9 +8,6 @@ using server.Interfaces.Services;
 using server.Models;
 using server.Queries;
 using server.Utilities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace server.Services
 {
@@ -79,10 +79,9 @@ namespace server.Services
 
             foreach (var feature in createRoomClassDto.Features)
             {
-                var roomClassFeature = new RoomClassFeature { FeatureId = feature.FeatureId, Quantity = feature.Quantity   };
+                var roomClassFeature = new RoomClassFeature { FeatureId = feature.FeatureId, Quantity = feature.Quantity };
                 newRoomClass.RoomClassFeatures.Add(roomClassFeature);
             }
-
 
             await _roomClassRepo.CreateNewRoomClass(newRoomClass);
             return new ServiceResponse
@@ -125,7 +124,7 @@ namespace server.Services
             await _roomClassRepo.DeleteFeatureOfRoomClass(roomClassId);
             foreach (var feature in updateRoomClassDto.Features)
             {
-                var roomClassFeature = new RoomClassFeature { FeatureId = feature.FeatureId, Quantity = feature.Quantity   };
+                var roomClassFeature = new RoomClassFeature { FeatureId = feature.FeatureId, Quantity = feature.Quantity };
                 targetRoomClass.RoomClassFeatures.Add(roomClassFeature);
             }
 
@@ -170,6 +169,5 @@ namespace server.Services
                 Message = SuccessMessage.DELETE_ROOM_CLASS_SUCCESSFULLY,
             };
         }
-
     }
 }

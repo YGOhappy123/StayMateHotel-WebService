@@ -9,7 +9,6 @@ using Microsoft.OpenApi.Models;
 using server.Data;
 using server.Interfaces.Repositories;
 using server.Interfaces.Services;
-using server.Models;
 using server.Repositories;
 using server.Services;
 
@@ -128,10 +127,9 @@ namespace server.Extensions
             services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IFloorRepository, FloorRepository>();
-            services.AddScoped<IRoomClassRepository, RoomClassRepository>();    
+            services.AddScoped<IRoomClassRepository, RoomClassRepository>();
             services.AddScoped<IFeatureRepository, FeatureRepository>();
             services.AddScoped<IRoomClassFeatureRepository, RoomClassFeatureRepository>();
-
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtService, JwtService>();
@@ -139,9 +137,8 @@ namespace server.Extensions
             services.AddScoped<IMailerService, MailerService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IFloorService, FloorService>();
-            services.AddScoped<IRoomClassService, RoomClassService>();    
+            services.AddScoped<IRoomClassService, RoomClassService>();
             services.AddScoped<IFeatureService, FeatureService>();
-
 
             return services;
         }
