@@ -14,6 +14,12 @@ namespace server.Dtos.Floor
         public string FloorNumber { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public UserInfo? CreatedBy { get; set; }
-        public List<string>? Rooms { get; set; } = [];
+        public List<RoomInfo>? Rooms { get; set; } = [];
+    }
+
+    public class RoomInfo
+    {
+        public int Id { get; set; }
+        public string RoomNumber { get; set; } = string.Empty;
     }
 }

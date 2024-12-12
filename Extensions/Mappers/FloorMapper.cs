@@ -17,7 +17,8 @@ namespace server.Extensions.Mappers
                 Id = floor.Id,
                 FloorNumber = floor.FloorNumber,
                 CreatedAt = floor.CreatedAt,
-                Rooms = floor.Rooms.Select(r => r.RoomNumber).ToList(),
+                Rooms =
+                    floor?.Rooms == null ? null : floor.Rooms.Select(r => new RoomInfo { Id = r.Id, RoomNumber = r.RoomNumber }).ToList(),
                 CreatedBy =
                     floor?.CreatedBy == null
                         ? null
