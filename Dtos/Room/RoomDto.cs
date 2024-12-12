@@ -40,7 +40,7 @@ namespace server.Dtos.Room
 
     public class RoomFeatureInfo
     {
-        public int? Id { get; set; }
+        public int? FeatureId { get; set; }
         public string? Name { get; set; }
         public int Quantity { get; set; }
     }
