@@ -5,22 +5,23 @@ using System.Threading.Tasks;
 using server.Dtos.RoomClass;
 using server.Models;
 
-namespace server.Extensions.Mappers{
+namespace server.Extensions.Mappers
+{
     public static class RoomClassMapper
     {
-      // Phương thức để chuyển đổi từ RoomClass sang RoomClassDto
-     public static RoomClassDto ToRoomClassDto(this RoomClass roomclassModel)
-    {
-
-        return new RoomClassDto
+        // Phương thức để chuyển đổi từ RoomClass sang RoomClassDto
+        public static RoomClassDto ToRoomClassDto(this RoomClass roomclassModel)
         {
-            Id = roomclassModel.Id,
-            ClassName = roomclassModel.ClassName,
-            BasePrice = roomclassModel.BasePrice,
-            Capacity = roomclassModel.Capacity,
-            CreatedAt = roomclassModel.CreatedAt,
-            CreateById = roomclassModel.CreatedById,
-            CreatedBy = roomclassModel?.CreatedBy == null
+            return new RoomClassDto
+            {
+                Id = roomclassModel.Id,
+                ClassName = roomclassModel.ClassName,
+                BasePrice = roomclassModel.BasePrice,
+                Capacity = roomclassModel.Capacity,
+                CreatedAt = roomclassModel.CreatedAt,
+                CreateById = roomclassModel.CreatedById,
+                CreatedBy =
+                    roomclassModel?.CreatedBy == null
                         ? null
                         : new UserInfo
                         {
@@ -29,9 +30,7 @@ namespace server.Extensions.Mappers{
                             LastName = roomclassModel.CreatedBy.LastName,
                             Email = roomclassModel.CreatedBy.Email,
                         },
-
-        };
+            };
+        }
     }
-
-}
 }
