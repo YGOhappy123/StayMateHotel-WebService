@@ -36,7 +36,7 @@ namespace server.Repositories
                             query = query.Where(rmc => rmc.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            query = query.Where(rmc => rmc.CreatedAt <= DateTime.Parse(value));
+                            query = query.Where(rmc => rmc.CreatedAt <= TimestampHandler.GetPreviousTimeByType(DateTime.Parse(value), "daily"));
                             break;
                         case "roomClass":
                             query = query.Where(rmc => rmc.ClassName.Contains(value));
