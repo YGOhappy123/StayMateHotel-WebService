@@ -35,7 +35,7 @@ namespace server.Repositories
                             query = query.Where(f => f.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            query = query.Where(f => f.CreatedAt <= DateTime.Parse(value));
+                            query = query.Where(f => f.CreatedAt <= TimestampHandler.GetEndOfTimeByType(DateTime.Parse(value), "daily"));
                             break;
                         case "floorNumber":
                             query = query.Where(f => f.FloorNumber.Contains(value));
