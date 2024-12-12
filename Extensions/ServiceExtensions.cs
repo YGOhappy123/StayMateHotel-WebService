@@ -9,7 +9,6 @@ using Microsoft.OpenApi.Models;
 using server.Data;
 using server.Interfaces.Repositories;
 using server.Interfaces.Services;
-using server.Models;
 using server.Repositories;
 using server.Services;
 
