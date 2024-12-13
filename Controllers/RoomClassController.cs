@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
@@ -7,9 +10,6 @@ using server.Interfaces.Services;
 using server.Models;
 using server.Queries;
 using server.Utilities;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace server.Controllers
 {
@@ -80,7 +80,10 @@ namespace server.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPatch("{roomClassId:int}")]
-        public async Task<IActionResult> UpdateRoomClass([FromRoute] int roomClassId, [FromBody] CreateUpdateRoomClassDto updateRoomClassDto)
+        public async Task<IActionResult> UpdateRoomClass(
+            [FromRoute] int roomClassId,
+            [FromBody] CreateUpdateRoomClassDto updateRoomClassDto
+        )
         {
             if (!ModelState.IsValid)
             {

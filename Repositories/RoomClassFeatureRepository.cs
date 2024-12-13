@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces.Repositories;
 using server.Models;
-using System.Threading.Tasks;
 
 namespace server.Repositories
 {
