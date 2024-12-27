@@ -8,6 +8,8 @@ namespace server.Utilities
     public static class ErrorMessage
     {
         public const string USERNAME_EXISTED = "USERNAME_EXISTED";
+        public const string EMAIL_EXISTED = "EMAIL_EXISTED";
+        public const string PHONE_NUMBER_EXISTED = "PHONE_NUMBER_EXISTED";
         public const string USER_NOT_FOUND = "USER_NOT_FOUND";
         public const string INCORRECT_USERNAME_OR_PASSWORD = "INCORRECT_USERNAME_OR_PASSWORD";
         public const string GOOGLE_AUTH_FAILED = "GOOGLE_AUTH_FAILED";
