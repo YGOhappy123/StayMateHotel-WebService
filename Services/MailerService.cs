@@ -100,5 +100,29 @@ namespace server.Services
             );
             await SendEmail(emailTo, title, body);
         }
+
+        public async Task SendWelcomeNewAdminEmail(
+            string emailTo,
+            string fullname,
+            string username,
+            string password,
+            string changePasswordUrl
+        )
+        {
+            string title = "StayMateHotel - Chào mừng admin mới";
+            string body = GenerateTemplate(
+                "WelcomeNewAdmin.hbs",
+                new
+                {
+                    Title = title,
+                    Fullname = fullname,
+                    Username = username,
+                    Password = password,
+                    ChangePasswordUrl = changePasswordUrl,
+                }
+            );
+
+            await SendEmail(emailTo, title, body);
+        }
     }
 }
