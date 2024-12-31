@@ -18,5 +18,6 @@ namespace server.Dtos.Auth
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
         public string Role { get; } = UserRole.Guest.ToString();
+        public bool? IsActive { get; set; } = true;
     }
 }

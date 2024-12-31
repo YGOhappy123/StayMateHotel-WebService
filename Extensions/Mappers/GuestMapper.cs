@@ -21,6 +21,7 @@ namespace server.Extensions.Mappers
                 CreatedAt = guest.CreatedAt,
                 PhoneNumber = guest.PhoneNumber,
                 Address = guest.Address,
+                IsActive = guest.Account != null && guest.Account.IsActive,
             };
         }
     }
