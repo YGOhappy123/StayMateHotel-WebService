@@ -126,34 +126,11 @@ namespace server.Extensions
             services.AddScoped<IGuestRepository, GuestRepository>();
             services.AddScoped<IAdminRepository, AdminRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
-//<<<<<<< HEAD
-//            services.AddScoped<IFeatureRepository, FeatureRepository>();
-//            services.AddScoped<IRoomClassFeatureRepository, RoomClassFeatureRepository>();
-//=======
-            services.AddScoped<IRoomClassRepository, RoomClassRepository>();    
             services.AddScoped<IFloorRepository, FloorRepository>();
             services.AddScoped<IRoomClassRepository, RoomClassRepository>();
             services.AddScoped<IFeatureRepository, FeatureRepository>();
             services.AddScoped<IRoomClassFeatureRepository, RoomClassFeatureRepository>();
-
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IJwtService, JwtService>();
-            services.AddScoped<IFileService, FileService>();
-            services.AddScoped<IMailerService, MailerService>();
-            //<<<<<<< HEAD
-            //            services.AddScoped<IFeatureService, FeatureService>();
-
-            //=======
-
-            //>>>>>>> ee47800ab1adf9e7aa82f961e9cfdb03f9602b90
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IGuestRepository, GuestRepository>();
-            services.AddScoped<IAdminRepository, AdminRepository>();
-            services.AddScoped<IRoomRepository, RoomRepository>();
-            services.AddScoped<IFloorRepository, FloorRepository>();
-            services.AddScoped<IRoomClassRepository, RoomClassRepository>();
-            services.AddScoped<IFeatureRepository, FeatureRepository>();
-            services.AddScoped<IRoomClassFeatureRepository, RoomClassFeatureRepository>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtService, JwtService>();
@@ -164,6 +141,7 @@ namespace server.Extensions
             services.AddScoped<IFloorService, FloorService>();
             services.AddScoped<IRoomClassService, RoomClassService>();
             services.AddScoped<IFeatureService, FeatureService>();
+            services.AddScoped<IServiceService, ServiceService>();
             return services;
         }
     }
