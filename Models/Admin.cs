@@ -8,6 +8,7 @@ namespace server.Models
 {
     public class Admin : AppUser
     {
+        public string PhoneNumber { get; set; } = string.Empty;
         public int? CreatedById { get; set; }
         public Admin? CreatedBy { get; set; }
         public List<Admin> CreatedAdmins { get; set; } = [];

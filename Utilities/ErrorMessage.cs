@@ -8,6 +8,8 @@ namespace server.Utilities
     public static class ErrorMessage
     {
         public const string USERNAME_EXISTED = "USERNAME_EXISTED";
+        public const string EMAIL_EXISTED = "EMAIL_EXISTED";
+        public const string PHONE_NUMBER_EXISTED = "PHONE_NUMBER_EXISTED";
         public const string USER_NOT_FOUND = "USER_NOT_FOUND";
         public const string INCORRECT_USERNAME_OR_PASSWORD = "INCORRECT_USERNAME_OR_PASSWORD";
         public const string GOOGLE_AUTH_FAILED = "GOOGLE_AUTH_FAILED";
@@ -29,5 +31,7 @@ namespace server.Utilities
         public const string FLOOR_NOT_FOUND = "FLOOR_NOT_FOUND";
         public const string DUPLICATE_FLOOR_NUMBER = "DUPLICATE_FLOOR_NUMBER";
         public const string FLOOR_CANNOT_BE_DELETED = "FLOOR_CANNOT_BE_DELETED";
+        public const string DUPLICATE_SERVICE_NAME = "DUPLICATE_SERVICE_NAME";
+        public const string SERVICE_NOT_FOUND = "SERVICE_NOT_FOUND";
     }
 }

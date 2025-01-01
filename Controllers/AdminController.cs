@@ -1,33 +1,35 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Dtos.Response;
-using server.Dtos.RoomClass;
+using server.Dtos.User;
 using server.Extensions.Mappers;
 using server.Interfaces.Services;
-using server.Models;
 using server.Queries;
 using server.Utilities;
 
 namespace server.Controllers
 {
     [ApiController]
-    [Route("/roomClasses")]
-    public class RoomClassController : ControllerBase
+    [Route("/admins")]
+    public class AdminController : ControllerBase
     {
-        private readonly IRoomClassService _roomClassService;
+        private readonly IUserService _userService;
 
-        public RoomClassController(IRoomClassService roomClassService)
+        public AdminController(IUserService userService)
         {
-            _roomClassService = roomClassService;
+            _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllRoomClasses([FromQuery] BaseQueryObject queryObject)
+        [Authorize(Roles = "Admin")]
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllAdmins([FromQuery] BaseQueryObject queryObject)
         {
-            var result = await _roomClassService.GetAllRoomClasses(queryObject);
+            var result = await _userService.GetAllAdmins(queryObject);
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
@@ -37,28 +39,16 @@ namespace server.Controllers
                 result.Status,
                 new SuccessResponseDto
                 {
-                    Data = result.Data!.Select(rm => rm.ToRoomClassDto()),
+                    Data = result.Data!.Select(ad => ad.ToAdminDto()),
                     Total = result.Total,
                     Took = result.Took,
                 }
             );
         }
 
-        [HttpGet("{roomClassId:int}")]
-        public async Task<IActionResult> GetRoomClassById([FromRoute] int roomClassId)
-        {
-            var result = await _roomClassService.GetRoomClassById(roomClassId);
-            if (!result.Success)
-            {
-                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
-            }
-
-            return StatusCode(result.Status, new SuccessResponseDto { Data = result.Data!.ToRoomClassDto() });
-        }
-
         [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> CreateNewRoomClass([FromBody] CreateUpdateRoomClassDto createRoomClassDto)
+        [HttpPost("")]
+        public async Task<IActionResult> CreateNewAdmin([FromBody] CreateAdminDto createAdminDto)
         {
             if (!ModelState.IsValid)
             {
@@ -69,7 +59,8 @@ namespace server.Controllers
             }
 
             var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-            var result = await _roomClassService.CreateNewRoomClass(createRoomClassDto, int.Parse(authUserId!));
+
+            var result = await _userService.CreateNewAdmin(createAdminDto, int.Parse(authUserId!));
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
@@ -79,11 +70,8 @@ namespace server.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPatch("{roomClassId:int}")]
-        public async Task<IActionResult> UpdateRoomClass(
-            [FromRoute] int roomClassId,
-            [FromBody] CreateUpdateRoomClassDto updateRoomClassDto
-        )
+        [HttpPatch("profile")]
+        public async Task<IActionResult> UpdateAdminProfile([FromBody] UpdateAdminDto updateAdminDto)
         {
             if (!ModelState.IsValid)
             {
@@ -93,7 +81,9 @@ namespace server.Controllers
                 );
             }
 
-            var result = await _roomClassService.UpdateRoomClass(roomClassId, updateRoomClassDto);
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+            var result = await _userService.UpdateAdminProfile(updateAdminDto, int.Parse(authUserId!));
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
@@ -103,10 +93,12 @@ namespace server.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{roomClassId:int}")]
-        public async Task<IActionResult> DeleteRoomClass([FromRoute] int roomClassId)
+        [HttpPost("toggle-active/{adminId:int}")]
+        public async Task<IActionResult> ToggleAdminActiveStatus([FromRoute] int adminId)
         {
-            var result = await _roomClassService.DeleteRoomClass(roomClassId);
+            var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+            var result = await _userService.ToggleAdminActiveStatus(adminId, int.Parse(authUserId!));
             if (!result.Success)
             {
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
