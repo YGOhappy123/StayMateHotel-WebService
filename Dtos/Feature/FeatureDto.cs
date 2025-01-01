@@ -10,19 +10,23 @@ namespace server.Dtos.Feature
         public string Name { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int? CreatedById { get; set; }
-        public FeatureCreatedByInfo? CreatedBy { get; set; }
-        public List<FeatureRoomClassInfo>? RoomClassFeatures { get; set; } = new List<FeatureRoomClassInfo>();
+        public AdminInfo? CreatedBy { get; set; }
+        public List<FeatureRoomClassInfo>? RoomClasses { get; set; } = [];
     }
 
-    public class FeatureCreatedByInfo
+    public class AdminInfo
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string? Email { get; set; }
     }
+
 
     public class FeatureRoomClassInfo
     {
-        public int? Id { get; set; }
-        public string? ClassName { get; set; } = string.Empty;
+        public int? RoomClassId { get; set; }
+        public string? Name { get; set; } = string.Empty;
+        public int Quantity { get; set; }
     }
 }

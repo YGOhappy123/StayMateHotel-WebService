@@ -14,18 +14,21 @@ namespace server.Extensions.Mappers
                 Id = feature.Id,
                 Name = feature.Name,
                 CreatedAt = feature.CreatedAt,
-                CreatedById = feature.CreatedById, 
-                CreatedBy = feature.CreatedBy == null ? null : new FeatureCreatedByInfo
+                CreatedById = feature.CreatedById,
+                CreatedBy = feature.CreatedBy == null ? null : new AdminInfo
                 {
                     Id = feature.CreatedBy.Id,
-                    Name = feature.CreatedBy.FirstName + " " + feature.CreatedBy.LastName // Kết hợp FirstName và LastName
+                    FirstName = feature.CreatedBy.FirstName,
+                    LastName = feature.CreatedBy.LastName,
+                    Email = feature.CreatedBy.Email,
                 },
-                RoomClassFeatures = feature.RoomClassFeatures == null
+                RoomClasses = feature.RoomClassFeatures == null
                     ? new List<FeatureRoomClassInfo>()
                     : feature.RoomClassFeatures.Select(rcf => new FeatureRoomClassInfo
                     {
-                        Id = rcf.RoomClassId,
-                        ClassName = rcf.RoomClass?.ClassName // Lấy ClassName từ RoomClass liên kết với RoomClassFeature
+                        RoomClassId = rcf.RoomClassId,
+                        Name = rcf.RoomClass?.ClassName, // Lấy ClassName từ RoomClass liên kết với RoomClassFeature
+                        Quantity = rcf.Quantity,
                     }).ToList()
             };
         }
