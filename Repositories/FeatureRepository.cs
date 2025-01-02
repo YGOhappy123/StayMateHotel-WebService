@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HandlebarsDotNet;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces.Repositories;
@@ -20,8 +21,7 @@ namespace server.Repositories
         {
             _dbContext = context;
         }
-
-        // Áp dụng các bộ lọc cho danh sách Feature
+       
         private IQueryable<Feature> ApplyFilters(IQueryable<Feature> query, Dictionary<string, object> filters)
         {
             foreach (var filter in filters)
@@ -43,6 +43,12 @@ namespace server.Repositories
                             break;
                         case "endTime":
                             query = query.Where(f => f.CreatedAt <= DateTime.Parse(value));
+                            break;
+                        case "roomClasses":
+                            var roomClassIds = JsonSerializer.Deserialize<List<int>>(filter.Value.ToString() ?? "[]");
+                            query = query.Where(feature =>
+                                roomClassIds!.All(roomClassId => feature.RoomClassFeatures.Any(rcf => rcf.RoomClassId == roomClassId))
+                            );
                             break;
                         default:
                             query = query.Where(f => EF.Property<string>(f, filter.Key.CapitalizeWord()) == value);
@@ -87,7 +93,8 @@ namespace server.Repositories
         {
             var query = _dbContext
                 .Features.Include(f => f.CreatedBy) // Ánh xạ với CreatedBy nếu cần
-                .Include(f => f.RoomClassFeatures) // Ánh xạ RoomClassFeatures nếu cần
+                .Include(f => f.RoomClassFeatures)
+                .ThenInclude(rcf => rcf.RoomClass)
                 .AsQueryable();
 
             // Áp dụng bộ lọc nếu có
@@ -123,6 +130,7 @@ namespace server.Repositories
             return await _dbContext.Features
                 .Include(f => f.CreatedBy)
                 .Include(f => f.RoomClassFeatures)
+                .ThenInclude(rcf => rcf.RoomClass)
                 .Where(f => f.Id == featureId)
                 .FirstOrDefaultAsync();
         }

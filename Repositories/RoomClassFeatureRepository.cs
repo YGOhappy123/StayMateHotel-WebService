@@ -14,7 +14,13 @@ namespace server.Repositories
         {
             _context = context;
         }
-
+        //public async Task<List<RoomClassFeature>> GetAllRoomClassFeaturesAsync()
+        //{
+        //    return await _context.RoomClassFeatures
+        //        .Include(rcf => rcf.Feature)
+        //        .Include(rcf => rcf.RoomClass) // Load RoomClass để tránh null
+        //        .ToListAsync();
+        //}
         // Phương thức xóa RoomClassFeature
         public async Task DeleteRoomClassFeature(RoomClassFeature roomClassFeature)
         {

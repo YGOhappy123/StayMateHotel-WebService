@@ -31,7 +31,12 @@ namespace server.Utilities
         public const string FLOOR_NOT_FOUND = "FLOOR_NOT_FOUND";
         public const string DUPLICATE_FLOOR_NUMBER = "DUPLICATE_FLOOR_NUMBER";
         public const string FLOOR_CANNOT_BE_DELETED = "FLOOR_CANNOT_BE_DELETED";
-        public const string DUPLICATE_SERVICE_NAME = "DUPLICATE_SERVICE_NAME";
+
+     
+
         public const string SERVICE_NOT_FOUND = "SERVICE_NOT_FOUND";
+        public const string DUPLICATE_SERVICE_NAME = "DUPLICATE_SERVICE_NAME";
+        public const string SERVICE_NOT_FOUND_OR_UNAVAILABLE = "SERVICE_NOT_FOUND_OR_UNAVAILABLE";
+
     }
 }

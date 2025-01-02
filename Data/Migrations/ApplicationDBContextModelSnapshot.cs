@@ -380,6 +380,8 @@ namespace server.Data.Migrations
 
                     b.HasIndex("FeatureId");
 
+                    //b.HasIndex("RoomClassId");
+
                     b.ToTable("RoomClassFeatures");
                 });
 
