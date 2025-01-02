@@ -45,7 +45,15 @@ namespace server.Repositories
                             query = query.Where(s => s.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            query = query.Where(s => s.CreatedAt <= DateTime.Parse(value));
+                            query = query.Where(s =>
+                                s.CreatedAt <= TimestampHandler.GetEndOfTimeByType(DateTime.Parse(value), "daily")
+                            );
+                            break;
+                        case "minPrice":
+                            query = query.Where(s => s.Price >= Convert.ToDecimal(value));  // Lọc theo giá lớn hơn hoặc bằng minPrice
+                            break;
+                        case "maxPrice":
+                            query = query.Where(s => s.Price <= Convert.ToDecimal(value));  // Lọc theo giá nhỏ hơn hoặc bằng maxPrice
                             break;
                         default:
                             query = query.Where(s => EF.Property<string>(s, filter.Key.CapitalizeWord()) == value);
