@@ -21,7 +21,10 @@ namespace server.Extensions.Mappers
                 Name = feature.Name,
                 CreatedAt = feature.CreatedAt,
                 CreatedById = feature.CreatedById,
-                CreatedBy = feature.CreatedBy == null ? null : new UserInfo
+
+                CreatedBy = feature.CreatedBy == null ? null : new AdminInfo
+
+
                 {
                     Id = feature.CreatedBy.Id,
                     FirstName = feature.CreatedBy.FirstName,
@@ -29,13 +32,15 @@ namespace server.Extensions.Mappers
                     Email = feature.CreatedBy.Email,
                 },
 
-                RoomClass = feature?.RoomClassFeatures == null
-                    ? null
-                    : feature.RoomClassFeatures.Select(ft => new FeatureRoomClassInfo
+                RoomClasses = feature.RoomClassFeatures == null
+                    ? new List<FeatureRoomClassInfo>()
+                    : feature.RoomClassFeatures.Select(rcf => new FeatureRoomClassInfo
                     {
-                        Id = ft.RoomClassId,
-                        ClassName = ft.RoomClass == null ? "ACSS" : ft.RoomClass?.ClassName,
-                        Quantity = ft.Quantity,
+                        RoomClassId = rcf.RoomClassId,
+                        Name = rcf.RoomClass?.ClassName, // Lấy ClassName từ RoomClass liên kết với RoomClassFeature
+                        Quantity = rcf.Quantity,
+
+
                     }).ToList()
                 
             };
