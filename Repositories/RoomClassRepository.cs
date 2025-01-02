@@ -36,7 +36,9 @@ namespace server.Repositories
                             query = query.Where(rmc => rmc.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            query = query.Where(rmc => rmc.CreatedAt <= DateTime.Parse(value));
+                            query = query.Where(rmc =>
+                                rmc.CreatedAt <= TimestampHandler.GetEndOfTimeByType(DateTime.Parse(value), "daily")
+                            );
                             break;
                         case "roomClass":
                             query = query.Where(rmc => rmc.ClassName.Contains(value));
@@ -73,12 +75,10 @@ namespace server.Repositories
         {
             foreach (var order in sort)
             {
-                
                 query =
                     order.Value == "ASC"
                         ? query.OrderBy(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()))
                         : query.OrderByDescending(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()));
-                
             }
 
             return query;
@@ -88,7 +88,7 @@ namespace server.Repositories
         public async Task<(List<RoomClass>, int)> GetAllRoomClasses(BaseQueryObject queryObject)
         {
             var query = _dbContext
-                .RoomClasses
+                .RoomClasses.Include(rmc => rmc.CreatedBy)
                 .Include(rmc => rmc.Rooms)
                 .Include(rmc => rmc.RoomClassFeatures)
                 .ThenInclude(rcf => rcf.Feature)
@@ -98,7 +98,8 @@ namespace server.Repositories
             if (!string.IsNullOrEmpty(queryObject.Filter))
             {
                 var parsedFilter = JsonSerializer.Deserialize<Dictionary<string, object>>(queryObject.Filter);
-                query = ApplyFilters(query, parsedFilter!);            }
+                query = ApplyFilters(query, parsedFilter!);
+            }
 
             // Sort
             if (!string.IsNullOrWhiteSpace(queryObject.Sort))
@@ -120,12 +121,10 @@ namespace server.Repositories
             return (roomClasses, total);
         }
 
-
         public async Task<RoomClass?> GetRoomClassById(int roomClassId)
         {
             return await _dbContext
-                .RoomClasses
-                .Include(rmc => rmc.Rooms)
+                .RoomClasses.Include(rmc => rmc.Rooms)
                 .Include(rmc => rmc.RoomClassFeatures)
                 .ThenInclude(rcf => rcf.Feature)
                 .Where(rmc => rmc.Id == roomClassId)
@@ -146,8 +145,8 @@ namespace server.Repositories
         // Cập nhật RoomClass
         public async Task UpdateRoomClass(RoomClass roomClass)
         {
-            _dbContext.RoomClasses.Update(roomClass);  // Cập nhật phòng học trong DbContext
-            await _dbContext.SaveChangesAsync();  // Lưu thay đổi vào cơ sở dữ liệu
+            _dbContext.RoomClasses.Update(roomClass); // Cập nhật phòng học trong DbContext
+            await _dbContext.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
         }
 
         // Xóa RoomClass theo Id

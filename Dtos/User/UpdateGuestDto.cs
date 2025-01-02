@@ -1,23 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using server.Dtos.Auth;
-using server.Enums;
 
-namespace server.Dtos.Auth
+namespace server.Dtos.User
 {
-    public class GuestDto
+    public class UpdateGuestDto
     {
-        public int Id { get; set; }
+        [Required]
         public string FirstName { get; set; } = string.Empty;
+
+        [Required]
         public string LastName { get; set; } = string.Empty;
+
+        [EmailAddress]
         public string? Email { get; set; }
+
+        [Url]
         public string? Avatar { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [Phone]
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
-        public string Role { get; } = UserRole.Guest.ToString();
-        public bool? IsActive { get; set; } = true;
     }
 }

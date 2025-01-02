@@ -15,5 +15,7 @@ namespace server.Interfaces.Services
             string password,
             string changePasswordUrl
         );
+
+        Task SendWelcomeNewAdminEmail(string emailTo, string fullname, string username, string password, string changePasswordUrl);
     }
 }

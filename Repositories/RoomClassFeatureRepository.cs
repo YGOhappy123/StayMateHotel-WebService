@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces.Repositories;
 using server.Models;
-using System.Threading.Tasks;
 
 namespace server.Repositories
 {
@@ -14,7 +14,13 @@ namespace server.Repositories
         {
             _context = context;
         }
-
+        //public async Task<List<RoomClassFeature>> GetAllRoomClassFeaturesAsync()
+        //{
+        //    return await _context.RoomClassFeatures
+        //        .Include(rcf => rcf.Feature)
+        //        .Include(rcf => rcf.RoomClass) // Load RoomClass để tránh null
+        //        .ToListAsync();
+        //}
         // Phương thức xóa RoomClassFeature
         public async Task DeleteRoomClassFeature(RoomClassFeature roomClassFeature)
         {

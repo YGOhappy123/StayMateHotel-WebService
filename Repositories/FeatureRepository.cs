@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using HandlebarsDotNet;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
 using server.Interfaces.Repositories;
@@ -20,8 +21,7 @@ namespace server.Repositories
         {
             _dbContext = context;
         }
-
-        // Áp dụng các bộ lọc cho danh sách Feature
+       
         private IQueryable<Feature> ApplyFilters(IQueryable<Feature> query, Dictionary<string, object> filters)
         {
             foreach (var filter in filters)
@@ -46,10 +46,15 @@ namespace server.Repositories
                             break;
                         case "roomClasses":
                             var roomClassIds = JsonSerializer.Deserialize<List<int>>(filter.Value.ToString() ?? "[]");
+
                             query = query.Where(f =>
                                 f.RoomClassFeatures.All(rmc =>
                                     roomClassIds!.Contains(rmc.RoomClassId.GetValueOrDefault()) // Lấy giá trị của RoomClassId nếu có
                                 )
+//=======
+//                            query = query.Where(feature =>
+//                                roomClassIds!.All(roomClassId => feature.RoomClassFeatures.Any(rcf => rcf.RoomClassId == roomClassId))
+//>>>>>>> main
                             );
                             break;
                         default:
@@ -96,7 +101,10 @@ namespace server.Repositories
             var query = _dbContext
                 .Features.Include(f => f.CreatedBy) // Ánh xạ với CreatedBy nếu cần
                 .Include(f => f.RoomClassFeatures)
+
                 .ThenInclude(rcf => rcf.RoomClass)// Ánh xạ RoomClassFeatures nếu cần
+
+
                 .AsQueryable();
 
             // Áp dụng bộ lọc nếu có
