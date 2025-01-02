@@ -47,13 +47,13 @@ namespace server.Repositories
                         case "roomClasses":
                             var roomClassIds = JsonSerializer.Deserialize<List<int>>(filter.Value.ToString() ?? "[]");
 
-                            query = query.Where(f =>
-                                f.RoomClassFeatures.All(rmc =>
-                                    roomClassIds!.Contains(rmc.RoomClassId.GetValueOrDefault()) // Lấy giá trị của RoomClassId nếu có
-                                )
+                            //query = query.Where(f =>
+                            //    f.RoomClassFeatures.All(rmc =>
+                            //        roomClassIds!.Contains(rmc.RoomClassId.GetValueOrDefault()) // Lấy giá trị của RoomClassId nếu có
+                            //    )
 //=======
-//                            query = query.Where(feature =>
-//                                roomClassIds!.All(roomClassId => feature.RoomClassFeatures.Any(rcf => rcf.RoomClassId == roomClassId))
+                            query = query.Where(feature =>
+                                roomClassIds!.All(roomClassId => feature.RoomClassFeatures.Any(rcf => rcf.RoomClassId == roomClassId))
 //>>>>>>> main
                             );
                             break;
