@@ -7,6 +7,7 @@ namespace server.Models
 {
     public class BookingRoom
     {
+        public int NumberOfGuests { get; set; } = 1;
         public int? BookingId { get; set; }
         public Booking? Booking { get; set; }
         public int? RoomId { get; set; }

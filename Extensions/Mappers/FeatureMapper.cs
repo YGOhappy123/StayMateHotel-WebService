@@ -1,5 +1,11 @@
-﻿using System.Linq;
+﻿//using System.Linq;
+//using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using server.Dtos.Feature; // Import DTOs cho Feature
+//using server.Dtos.Room;
 using server.Models; // Import Models
 
 namespace server.Extensions.Mappers
@@ -14,19 +20,24 @@ namespace server.Extensions.Mappers
                 Id = feature.Id,
                 Name = feature.Name,
                 CreatedAt = feature.CreatedAt,
-                CreatedById = feature.CreatedById, 
-                CreatedBy = feature.CreatedBy == null ? null : new FeatureCreatedByInfo
+                CreatedById = feature.CreatedById,
+                CreatedBy = feature.CreatedBy == null ? null : new UserInfo
                 {
                     Id = feature.CreatedBy.Id,
-                    Name = feature.CreatedBy.FirstName + " " + feature.CreatedBy.LastName // Kết hợp FirstName và LastName
+                    FirstName = feature.CreatedBy.FirstName,
+                    LastName = feature.CreatedBy.LastName,
+                    Email = feature.CreatedBy.Email,
                 },
-                RoomClassFeatures = feature.RoomClassFeatures == null
-                    ? new List<FeatureRoomClassInfo>()
-                    : feature.RoomClassFeatures.Select(rcf => new FeatureRoomClassInfo
+
+                RoomClass = feature?.RoomClassFeatures == null
+                    ? null
+                    : feature.RoomClassFeatures.Select(ft => new FeatureRoomClassInfo
                     {
-                        Id = rcf.RoomClassId,
-                        ClassName = rcf.RoomClass?.ClassName // Lấy ClassName từ RoomClass liên kết với RoomClassFeature
+                        Id = ft.RoomClassId,
+                        ClassName = ft.RoomClass == null ? "ACSS" : ft.RoomClass?.ClassName,
+                        Quantity = ft.Quantity,
                     }).ToList()
+                
             };
         }
     }

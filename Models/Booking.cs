@@ -12,7 +12,6 @@ namespace server.Models
         public int Id { get; set; }
         public DateTime CheckInTime { get; set; } = DateTime.Now;
         public DateTime CheckOutTime { get; set; } = DateTime.Now;
-        public int NumberOfGuests { get; set; } = 1;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public BookingStatus Status { get; set; } = BookingStatus.Pending;
