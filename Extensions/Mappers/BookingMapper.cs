@@ -1,0 +1,72 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using server.Dtos.Reservation;
+using server.Models;
+
+namespace server.Extensions.Mappers
+{
+    public static class BookingMapper
+    {
+        public static BookingDto ToBookingDto(this Booking booking)
+        {
+            return new BookingDto
+            {
+                Id = booking.Id,
+                CheckInTime = booking.CheckInTime,
+                CheckOutTime = booking.CheckOutTime,
+                Email = booking.Email,
+                PhoneNumber = booking.PhoneNumber,
+                Status = booking.Status.ToString(),
+                TotalAmount = booking.TotalAmount,
+                CreatedAt = booking.CreatedAt,
+                Guest =
+                    booking?.Guest == null
+                        ? null
+                        : new GuestInfo
+                        {
+                            Id = booking.Guest.Id,
+                            FirstName = booking.Guest.FirstName,
+                            LastName = booking.Guest.LastName,
+                        },
+                Payments =
+                    booking?.Payments == null
+                        ? null
+                        : booking
+                            .Payments.Select(pm => new PaymentInfo
+                            {
+                                Amount = pm.Amount,
+                                PaymentTime = pm.PaymentTime,
+                                Method = pm.Method.ToString(),
+                            })
+                            .ToList(),
+                BookingRooms =
+                    booking?.BookingRooms == null
+                        ? null
+                        : booking
+                            .BookingRooms.Select(bkr => new BookingRoomInfo
+                            {
+                                NumberOfGuests = bkr.NumberOfGuests,
+                                UnitPrice = bkr.UnitPrice,
+                                RoomNumber = bkr?.Room?.RoomNumber,
+                                Floor = bkr?.Room?.Floor?.FloorNumber,
+                                RoomClass = bkr?.Room?.RoomClass?.ClassName,
+                            })
+                            .ToList(),
+                BookingServices =
+                    booking?.BookingServices == null
+                        ? null
+                        : booking
+                            .BookingServices.Select(bks => new BookingServiceInfo
+                            {
+                                Quantity = bks.Quantity ?? 1,
+                                UnitPrice = bks.UnitPrice,
+                                Status = bks.Status.ToString(),
+                                Name = bks?.Service?.Name,
+                            })
+                            .ToList(),
+            };
+        }
+    }
+}

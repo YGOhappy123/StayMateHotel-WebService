@@ -39,6 +39,7 @@ namespace server.Data
             modelBuilder.Entity<Account>().Property(acc => acc.Role).HasConversion<string>();
             modelBuilder.Entity<Room>().Property(rm => rm.Status).HasConversion<string>();
             modelBuilder.Entity<Booking>().Property(bk => bk.Status).HasConversion<string>();
+            modelBuilder.Entity<BookingService>().Property(bks => bks.Status).HasConversion<string>();
             modelBuilder.Entity<Payment>().Property(pm => pm.Method).HasConversion<string>();
 
             modelBuilder.Entity<BookingRoom>().HasKey(br => new { br.BookingId, br.RoomId });

@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Enums;
 using server.Interfaces.Repositories;
 using server.Models;
 using server.Queries;
@@ -40,11 +41,19 @@ namespace server.Repositories
                         case "roomNumber":
                             query = query.Where(rm => rm.RoomNumber.Contains(value));
                             break;
+                        case "status":
+                            query = query.Where(rm => rm.Status == Enum.Parse<RoomStatus>(value));
+                            break;
                         case "minPrice":
                             query = query.Where(rm => rm.RoomClass!.BasePrice >= Convert.ToDecimal(value));
                             break;
                         case "maxPrice":
                             query = query.Where(rm => rm.RoomClass!.BasePrice <= Convert.ToDecimal(value));
+                            break;
+                        case "isAvailable":
+                            query = query.Where(rm =>
+                                value == "1" ? rm.Status != RoomStatus.OutOfService : rm.Status == RoomStatus.OutOfService
+                            );
                             break;
                         case "features":
                             var featureIds = JsonSerializer.Deserialize<List<int>>(filter.Value.ToString() ?? "[]");
@@ -160,6 +169,17 @@ namespace server.Repositories
         public async Task<int> CountBookedTimes(int roomId)
         {
             return await _dbContext.BookingRooms.Where(bkr => bkr.RoomId == roomId).CountAsync();
+        }
+
+        public async Task<bool> CheckIfRoomIsBooked(int roomId)
+        {
+            var upcomingBookingRoomIds = await _dbContext
+                .Bookings.Where(bk => bk.Status != BookingStatus.Cancelled && bk.CheckInTime >= DateTime.Now.Date)
+                .SelectMany(bk => bk.BookingRooms.Select(br => br.RoomId))
+                .Distinct()
+                .ToListAsync();
+
+            return upcomingBookingRoomIds.Any(id => id == roomId);
         }
 
         public async Task DeleteOldImagesOfRoom(int roomId)
