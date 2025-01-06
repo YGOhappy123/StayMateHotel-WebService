@@ -26,6 +26,7 @@ namespace server.Controllers
             _floorService = floorService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllFloors([FromQuery] BaseQueryObject queryObject)
         {
