@@ -18,11 +18,13 @@ namespace server.Services
     {
         private readonly IReservationRepository _reservationRepo;
         private readonly IRoomRepository _roomRepo;
+        private readonly IPaymentRepository _paymentRepo;
 
-        public ReservationService(IReservationRepository reservationRepo, IRoomRepository roomRepo)
+        public ReservationService(IReservationRepository reservationRepo, IRoomRepository roomRepo, IPaymentRepository paymentRepo)
         {
             _reservationRepo = reservationRepo;
             _roomRepo = roomRepo;
+            _paymentRepo = paymentRepo;
         }
 
         public async Task<ServiceResponse<List<List<Room>>>> FindAvailableRooms(BaseQueryObject queryObject)
@@ -206,7 +208,7 @@ namespace server.Services
             }
             else
             {
-                var totalPayments = await _reservationRepo.GetBookingToTalPayments(bookingId);
+                var totalPayments = await _paymentRepo.GetBookingToTalPayments(bookingId);
                 var today = DateTime.Now.Date;
 
                 bool isPending = booking.Status == BookingStatus.Pending;
@@ -273,7 +275,7 @@ namespace server.Services
             }
 
             var today = DateTime.Now.Date;
-            var totalPayments = await _reservationRepo.GetBookingToTalPayments(bookingId);
+            var totalPayments = await _paymentRepo.GetBookingToTalPayments(bookingId);
 
             if (today < booking.CheckInTime.Date || totalPayments == 0)
             {
@@ -383,7 +385,7 @@ namespace server.Services
                 Method = Enum.Parse<PaymentMethod>(paymentDto.Method),
                 BookingId = bookingId,
             };
-            await _reservationRepo.MakeNewPayment(newPayment);
+            await _paymentRepo.MakeNewPayment(newPayment);
 
             return new ServiceResponse
             {
@@ -422,7 +424,7 @@ namespace server.Services
                 Method = Enum.Parse<PaymentMethod>(paymentDto.Method),
                 BookingId = bookingId,
             };
-            await _reservationRepo.MakeNewPayment(newPayment);
+            await _paymentRepo.MakeNewPayment(newPayment);
             await CheckPaymentDone(booking);
 
             return new ServiceResponse
@@ -435,7 +437,7 @@ namespace server.Services
 
         private async Task CheckPaymentDone(Booking booking)
         {
-            var totalPayments = await _reservationRepo.GetBookingToTalPayments(booking.Id);
+            var totalPayments = await _paymentRepo.GetBookingToTalPayments(booking.Id);
             if (totalPayments >= booking.TotalAmount)
             {
                 booking.Status = BookingStatus.PaymentDone;
@@ -465,6 +467,20 @@ namespace server.Services
                 Status = ResStatusCode.OK,
                 Success = true,
                 Data = statusCounts,
+            };
+        }
+
+        public async Task<ServiceResponse<List<Payment>>> GetAllTransactions(BaseQueryObject queryObject)
+        {
+            var (payments, total) = await _paymentRepo.GetAllPayments(queryObject);
+
+            return new ServiceResponse<List<Payment>>
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Data = payments,
+                Total = total,
+                Took = payments.Count,
             };
         }
     }

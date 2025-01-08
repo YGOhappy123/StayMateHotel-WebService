@@ -17,8 +17,6 @@ namespace server.Interfaces.Repositories
         Task<Booking?> GetBookingById(int bookingId);
         Task UpdateBooking(Booking booking);
         Task CancelReservationsWithDuplicateRooms(DateTime checkInDate, DateTime checkOutDate, int bookingId, int roomId);
-        Task<decimal> GetBookingToTalPayments(int bookingId);
-        Task MakeNewPayment(Payment payment);
         Task<int> CountBookingsByStatus(BookingStatus status, TimeRangeQueryObject queryObject);
     }
 }

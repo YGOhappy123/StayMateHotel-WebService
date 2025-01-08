@@ -71,5 +71,17 @@ namespace server.Extensions.Mappers
                             .ToList(),
             };
         }
+
+        public static PaymentDto ToPaymentDto(this Payment payment)
+        {
+            return new PaymentDto
+            {
+                Id = payment.Id,
+                Amount = payment.Amount,
+                PaymentTime = payment.PaymentTime,
+                Method = payment.Method.ToString(),
+                BookingId = payment.BookingId ?? 0,
+            };
+        }
     }
 }

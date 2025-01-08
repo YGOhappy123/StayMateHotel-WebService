@@ -200,5 +200,26 @@ namespace server.Controllers
 
             return StatusCode(result.Status, new SuccessResponseDto { Data = result.Data });
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("transactions")]
+        public async Task<IActionResult> GetAllTransactions([FromQuery] BaseQueryObject queryObject)
+        {
+            var result = await _reservationService.GetAllTransactions(queryObject);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Data = result.Data!.Select(pm => pm.ToPaymentDto()),
+                    Total = result.Total,
+                    Took = result.Took,
+                }
+            );
+        }
     }
 }

@@ -22,5 +22,6 @@ namespace server.Interfaces.Services
         Task<ServiceResponse> DepositBooking(int bookingId, DepositPaymentDto paymentDto);
         Task<ServiceResponse> MakePaymentBooking(int bookingId, MakePaymentDto paymentDto);
         Task<ServiceResponse<object>> CountBookingsByStatus(TimeRangeQueryObject queryObject);
+        Task<ServiceResponse<List<Payment>>> GetAllTransactions(BaseQueryObject queryObject);
     }
 }
