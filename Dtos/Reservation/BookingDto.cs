@@ -41,14 +41,17 @@ namespace server.Dtos.Reservation
 
     public class BookingServiceInfo
     {
+        public int Id { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public string Status { get; set; } = BookingServiceStatus.Pending.ToString();
         public string? Name { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
     public class PaymentInfo
     {
+        public int Id { get; set; }
         public decimal Amount { get; set; }
         public DateTime PaymentTime { get; set; } = DateTime.Now;
         public string Method { get; set; } = PaymentMethod.Cash.ToString();

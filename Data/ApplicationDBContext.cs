@@ -46,18 +46,6 @@ namespace server.Data
             modelBuilder.Entity<BookingRoom>().HasOne(br => br.Booking).WithMany(bk => bk.BookingRooms).HasForeignKey(br => br.BookingId);
             modelBuilder.Entity<BookingRoom>().HasOne(br => br.Room).WithMany(rm => rm.BookingRooms).HasForeignKey(br => br.RoomId);
 
-            modelBuilder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
-            modelBuilder
-                .Entity<BookingService>()
-                .HasOne(bs => bs.Booking)
-                .WithMany(bk => bk.BookingServices)
-                .HasForeignKey(bs => bs.BookingId);
-            modelBuilder
-                .Entity<BookingService>()
-                .HasOne(bs => bs.Service)
-                .WithMany(sv => sv.BookingServices)
-                .HasForeignKey(bs => bs.ServiceId);
-
             modelBuilder.Entity<RoomClassFeature>().HasKey(rcf => new { rcf.RoomClassId, rcf.FeatureId });
             modelBuilder
                 .Entity<RoomClassFeature>()

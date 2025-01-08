@@ -36,6 +36,7 @@ namespace server.Extensions.Mappers
                         : booking
                             .Payments.Select(pm => new PaymentInfo
                             {
+                                Id = pm.Id,
                                 Amount = pm.Amount,
                                 PaymentTime = pm.PaymentTime,
                                 Method = pm.Method.ToString(),
@@ -60,8 +61,10 @@ namespace server.Extensions.Mappers
                         : booking
                             .BookingServices.Select(bks => new BookingServiceInfo
                             {
+                                Id = bks.Id,
                                 Quantity = bks.Quantity ?? 1,
                                 UnitPrice = bks.UnitPrice,
+                                CreatedAt = bks.CreatedAt,
                                 Status = bks.Status.ToString(),
                                 Name = bks?.Service?.Name,
                             })

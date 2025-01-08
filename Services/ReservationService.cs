@@ -191,7 +191,10 @@ namespace server.Services
                     };
                 }
 
-                if (booking.Status != BookingStatus.Pending && booking.Status != BookingStatus.Confirmed)
+                if (
+                    (booking.Status != BookingStatus.Pending && booking.Status != BookingStatus.Confirmed)
+                    || booking.Status == BookingStatus.Cancelled
+                )
                 {
                     return new ServiceResponse
                     {
@@ -207,10 +210,11 @@ namespace server.Services
                 var today = DateTime.Now.Date;
 
                 bool isPending = booking.Status == BookingStatus.Pending;
+                bool isCancelled = booking.Status == BookingStatus.Cancelled;
                 bool isConfirmedWithoutDeposit = booking.Status == BookingStatus.Confirmed && totalPayments == 0;
                 bool isAfterCheckInWithoutDeposit = today > booking.CheckInTime.Date && totalPayments == 0;
 
-                if (!isPending && !isConfirmedWithoutDeposit && !isAfterCheckInWithoutDeposit)
+                if ((!isPending && !isConfirmedWithoutDeposit && !isAfterCheckInWithoutDeposit) || isCancelled)
                 {
                     return new ServiceResponse
                     {
