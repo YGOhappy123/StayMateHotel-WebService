@@ -16,6 +16,7 @@ namespace server.Interfaces.Repositories
         Task UpdateRoom(Room room);
         Task DeleteRoom(Room room);
         Task<int> CountBookedTimes(int roomId);
+        Task<bool> CheckIfRoomIsBooked(int roomId);
         Task DeleteOldImagesOfRoom(int roomId);
     }
 }

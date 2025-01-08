@@ -110,13 +110,24 @@ namespace server.Services
                 };
             }
 
-            if (targetRoom.Status == RoomStatus.Reserved || targetRoom.Status == RoomStatus.Occupied)
+            if (targetRoom.Status == RoomStatus.Occupied)
             {
                 return new ServiceResponse
                 {
                     Status = ResStatusCode.BAD_REQUEST,
                     Success = false,
                     Message = ErrorMessage.ROOM_CANNOT_BE_UPDATED,
+                };
+            }
+
+            var isRoomBooked = await _roomRepo.CheckIfRoomIsBooked(roomId);
+            if (isRoomBooked)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.BAD_REQUEST,
+                    Success = false,
+                    Message = ErrorMessage.ROOM_IS_RESERVED_AND_WILL_BE_OCCUPIED_SOON,
                 };
             }
 
@@ -198,13 +209,24 @@ namespace server.Services
                 };
             }
 
-            if (room.Status == RoomStatus.Reserved || room.Status == RoomStatus.Occupied)
+            if (room.Status == RoomStatus.Occupied)
             {
                 return new ServiceResponse
                 {
                     Status = ResStatusCode.BAD_REQUEST,
                     Success = false,
                     Message = ErrorMessage.ROOM_CANNOT_BE_UPDATED,
+                };
+            }
+
+            var isRoomBooked = await _roomRepo.CheckIfRoomIsBooked(roomId);
+            if (isRoomBooked && room.Status == RoomStatus.Available)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.BAD_REQUEST,
+                    Success = false,
+                    Message = ErrorMessage.ROOM_IS_RESERVED_AND_WILL_BE_OCCUPIED_SOON,
                 };
             }
 

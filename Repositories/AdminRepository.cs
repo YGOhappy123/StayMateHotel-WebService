@@ -35,7 +35,7 @@ namespace server.Repositories
                             query = query.Where(ad => ad.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            query = query.Where(ad => ad.CreatedAt <= DateTime.Parse(value));
+                            query = query.Where(f => f.CreatedAt <= TimestampHandler.GetEndOfTimeByType(DateTime.Parse(value), "daily"));
                             break;
                         case "email":
                             query = query.Where(ad => ad.Email!.Contains(value));

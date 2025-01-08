@@ -12,4 +12,10 @@ namespace server.Queries
         public string? Sort { get; set; } = "{\"CreatedAt\": \"DESC\"}";
         public string? Filter { get; set; } = "{}";
     }
+
+    public class TimeRangeQueryObject
+    {
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+    }
 }

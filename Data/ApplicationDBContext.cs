@@ -39,23 +39,12 @@ namespace server.Data
             modelBuilder.Entity<Account>().Property(acc => acc.Role).HasConversion<string>();
             modelBuilder.Entity<Room>().Property(rm => rm.Status).HasConversion<string>();
             modelBuilder.Entity<Booking>().Property(bk => bk.Status).HasConversion<string>();
+            modelBuilder.Entity<BookingService>().Property(bks => bks.Status).HasConversion<string>();
             modelBuilder.Entity<Payment>().Property(pm => pm.Method).HasConversion<string>();
 
             modelBuilder.Entity<BookingRoom>().HasKey(br => new { br.BookingId, br.RoomId });
             modelBuilder.Entity<BookingRoom>().HasOne(br => br.Booking).WithMany(bk => bk.BookingRooms).HasForeignKey(br => br.BookingId);
             modelBuilder.Entity<BookingRoom>().HasOne(br => br.Room).WithMany(rm => rm.BookingRooms).HasForeignKey(br => br.RoomId);
-
-            modelBuilder.Entity<BookingService>().HasKey(bs => new { bs.BookingId, bs.ServiceId });
-            modelBuilder
-                .Entity<BookingService>()
-                .HasOne(bs => bs.Booking)
-                .WithMany(bk => bk.BookingServices)
-                .HasForeignKey(bs => bs.BookingId);
-            modelBuilder
-                .Entity<BookingService>()
-                .HasOne(bs => bs.Service)
-                .WithMany(sv => sv.BookingServices)
-                .HasForeignKey(bs => bs.ServiceId);
 
             modelBuilder.Entity<RoomClassFeature>().HasKey(rcf => new { rcf.RoomClassId, rcf.FeatureId });
             modelBuilder
