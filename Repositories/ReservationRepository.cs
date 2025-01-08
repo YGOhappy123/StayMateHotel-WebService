@@ -246,17 +246,6 @@ namespace server.Repositories
             }
         }
 
-        public Task<decimal> GetBookingToTalPayments(int bookingId)
-        {
-            return _dbContext.Payments.Where(pm => pm.BookingId == bookingId).SumAsync(pm => pm.Amount);
-        }
-
-        public async Task MakeNewPayment(Payment payment)
-        {
-            _dbContext.Payments.Add(payment);
-            await _dbContext.SaveChangesAsync();
-        }
-
         public async Task<int> CountBookingsByStatus(BookingStatus status, TimeRangeQueryObject queryObject)
         {
             var query = _dbContext.Bookings.Where(bk => bk.Status == status).AsQueryable();
