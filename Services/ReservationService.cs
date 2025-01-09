@@ -19,12 +19,22 @@ namespace server.Services
         private readonly IReservationRepository _reservationRepo;
         private readonly IRoomRepository _roomRepo;
         private readonly IPaymentRepository _paymentRepo;
+        private readonly IBookingServiceRepository _bkServiceRepo;
+        private readonly IServiceRepository _serviceRepo;
 
-        public ReservationService(IReservationRepository reservationRepo, IRoomRepository roomRepo, IPaymentRepository paymentRepo)
+        public ReservationService(
+            IReservationRepository reservationRepo,
+            IRoomRepository roomRepo,
+            IPaymentRepository paymentRepo,
+            IBookingServiceRepository bkServiceRepo,
+            IServiceRepository serviceRepo
+        )
         {
             _reservationRepo = reservationRepo;
             _roomRepo = roomRepo;
             _paymentRepo = paymentRepo;
+            _bkServiceRepo = bkServiceRepo;
+            _serviceRepo = serviceRepo;
         }
 
         public async Task<ServiceResponse<List<List<Room>>>> FindAvailableRooms(BaseQueryObject queryObject)
@@ -481,6 +491,196 @@ namespace server.Services
                 Data = payments,
                 Total = total,
                 Took = payments.Count,
+            };
+        }
+
+        public async Task<ServiceResponse<List<BookingService>>> GetAllBookingServices(BaseQueryObject queryObject)
+        {
+            var (bookingServices, total) = await _bkServiceRepo.GetAllBookingServices(queryObject);
+
+            return new ServiceResponse<List<BookingService>>
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Data = bookingServices,
+                Total = total,
+                Took = bookingServices.Count,
+            };
+        }
+
+        public async Task<ServiceResponse<object>> CountBookingServicesByStatus(TimeRangeQueryObject queryObject)
+        {
+            var statusCounts = new Dictionary<string, int>();
+
+            foreach (BookingServiceStatus status in Enum.GetValues(typeof(BookingServiceStatus)))
+            {
+                var count = await _bkServiceRepo.CountBookingsByStatus(status, queryObject);
+                statusCounts[status.ToString()] = count;
+            }
+
+            return new ServiceResponse<object>
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Data = statusCounts,
+            };
+        }
+
+        public async Task<ServiceResponse> BookService(OrderBookingServiceDto orderBookingServiceDto, int bookingId)
+        {
+            var booking = await _reservationRepo.GetBookingById(bookingId);
+            if (booking == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.BOOKING_NOT_FOUND,
+                };
+            }
+
+            if (booking.Status != BookingStatus.CheckedIn)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.CANNOT_UPDATE_BOOKING_WITH_THIS_STATUS,
+                };
+            }
+
+            var serviceInfo = await _serviceRepo.GetServiceById((int)orderBookingServiceDto.ServiceId!);
+            if (serviceInfo == null || serviceInfo.IsAvailable == false)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.SERVICE_NOT_FOUND_OR_UNAVAILABLE,
+                };
+            }
+
+            var newBookingService = new BookingService
+            {
+                BookingId = bookingId,
+                ServiceId = orderBookingServiceDto.ServiceId,
+                Quantity = orderBookingServiceDto.Quantity,
+                UnitPrice = serviceInfo.Price,
+                Status = BookingServiceStatus.Pending,
+            };
+            await _bkServiceRepo.CreateNewBookingService(newBookingService);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.CREATED,
+                Success = true,
+                Message = SuccessMessage.BOOK_SERVICE_SUCCESSFULLY,
+            };
+        }
+
+        public async Task<ServiceResponse> AcceptBookingService(int bookingServiceId)
+        {
+            var bookingService = await _bkServiceRepo.GetBookingServiceById(bookingServiceId);
+            if (bookingService == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.BOOKING_SERVICE_NOT_FOUND,
+                };
+            }
+
+            if (bookingService.Status != BookingServiceStatus.Pending)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.CANNOT_UPDATE_BOOKING_SERVICE_WITH_THIS_STATUS,
+                };
+            }
+
+            bookingService.Status = BookingServiceStatus.Accepted;
+            await _bkServiceRepo.UpdateBookingService(bookingService);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.UPDATE_BOOKING_SERVICE_SUCCESSFULLY,
+            };
+        }
+
+        public async Task<ServiceResponse> RejectBookingService(int bookingServiceId)
+        {
+            var bookingService = await _bkServiceRepo.GetBookingServiceById(bookingServiceId);
+            if (bookingService == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.BOOKING_SERVICE_NOT_FOUND,
+                };
+            }
+
+            if (bookingService.Status != BookingServiceStatus.Pending)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.CANNOT_UPDATE_BOOKING_SERVICE_WITH_THIS_STATUS,
+                };
+            }
+
+            bookingService.Status = BookingServiceStatus.Rejected;
+            await _bkServiceRepo.UpdateBookingService(bookingService);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.UPDATE_BOOKING_SERVICE_SUCCESSFULLY,
+            };
+        }
+
+        public async Task<ServiceResponse> HandOverBookingService(int bookingServiceId)
+        {
+            var bookingService = await _bkServiceRepo.GetBookingServiceById(bookingServiceId);
+            if (bookingService == null)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.BOOKING_SERVICE_NOT_FOUND,
+                };
+            }
+
+            if (bookingService.Status != BookingServiceStatus.Accepted)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.NOT_FOUND,
+                    Success = false,
+                    Message = ErrorMessage.CANNOT_UPDATE_BOOKING_SERVICE_WITH_THIS_STATUS,
+                };
+            }
+
+            bookingService.Status = BookingServiceStatus.Done;
+            await _bkServiceRepo.UpdateBookingService(bookingService);
+
+            var booking = bookingService.Booking;
+            booking!.TotalAmount += bookingService.UnitPrice * (bookingService.Quantity ?? 1);
+            await _reservationRepo.UpdateBooking(booking);
+
+            return new ServiceResponse
+            {
+                Status = ResStatusCode.OK,
+                Success = true,
+                Message = SuccessMessage.UPDATE_BOOKING_SERVICE_SUCCESSFULLY,
             };
         }
     }
