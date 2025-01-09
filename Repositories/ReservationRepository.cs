@@ -76,6 +76,9 @@ namespace server.Repositories
                                 bk.Guest != null && (bk.Guest.FirstName.Contains(value) || bk.Guest.LastName.Contains(value))
                             );
                             break;
+                        case "status":
+                            query = query.Where(bk => bk.Status == Enum.Parse<BookingStatus>(value));
+                            break;
                         default:
                             query = query.Where(bk => EF.Property<string>(bk, filter.Key.CapitalizeWord()) == value);
                             break;

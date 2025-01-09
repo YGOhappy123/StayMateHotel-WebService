@@ -21,6 +21,8 @@ namespace server.Utilities
         public const string DUPLICATE_ROOM_NUMBER = "DUPLICATE_ROOM_NUMBER";
         public const string BOOKING_NOT_FOUND = "BOOKING_NOT_FOUND";
         public const string CANNOT_UPDATE_BOOKING_WITH_THIS_STATUS = "CANNOT_UPDATE_BOOKING_WITH_THIS_STATUS";
+        public const string BOOKING_SERVICE_NOT_FOUND = "BOOKING_SERVICE_NOT_FOUND";
+        public const string CANNOT_UPDATE_BOOKING_SERVICE_WITH_THIS_STATUS = "CANNOT_UPDATE_BOOKING_SERVICE_WITH_THIS_STATUS";
         public const string PLEASE_CLEAN_THE_ROOMS_FIRST = "PLEASE_CLEAN_THE_ROOMS_FIRST";
         public const string INVALID_DATE_OR_NO_DEPOSIT_TRACKED = "INVALID_DATE_OR_NO_DEPOSIT_TRACKED";
         public const string INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
@@ -36,7 +38,6 @@ namespace server.Utilities
         public const string FLOOR_NOT_FOUND = "FLOOR_NOT_FOUND";
         public const string DUPLICATE_FLOOR_NUMBER = "DUPLICATE_FLOOR_NUMBER";
         public const string FLOOR_CANNOT_BE_DELETED = "FLOOR_CANNOT_BE_DELETED";
-
         public const string SERVICE_NOT_FOUND = "SERVICE_NOT_FOUND";
         public const string DUPLICATE_SERVICE_NAME = "DUPLICATE_SERVICE_NAME";
         public const string SERVICE_NOT_FOUND_OR_UNAVAILABLE = "SERVICE_NOT_FOUND_OR_UNAVAILABLE";
