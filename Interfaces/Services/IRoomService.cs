@@ -12,7 +12,7 @@ namespace server.Interfaces.Services
     public interface IRoomService
     {
         Task<ServiceResponse<List<Room>>> GetAllRooms(BaseQueryObject queryObject);
-        Task<ServiceResponse<Room>> GetRoomById(int roomId);
+        Task<ServiceResponse<object>> GetRoomById(int roomId);
         Task<ServiceResponse> CreateNewRoom(CreateUpdateRoomDto createRoomDto, int adminId);
         Task<ServiceResponse> UpdateRoom(int roomId, CreateUpdateRoomDto updateRoomDto);
         Task<ServiceResponse> DeleteRoom(int roomId);
