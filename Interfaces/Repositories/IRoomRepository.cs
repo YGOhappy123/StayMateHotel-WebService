@@ -18,5 +18,6 @@ namespace server.Interfaces.Repositories
         Task<int> CountBookedTimes(int roomId);
         Task<bool> CheckIfRoomIsBooked(int roomId);
         Task DeleteOldImagesOfRoom(int roomId);
+        Task<int> GetRoomStatisticInTimeRange(DateTime startTime, DateTime endTime, int roomId);
     }
 }

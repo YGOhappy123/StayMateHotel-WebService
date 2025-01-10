@@ -189,5 +189,21 @@ namespace server.Repositories
             _dbContext.RoomImages.RemoveRange(images);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<int> GetRoomStatisticInTimeRange(DateTime startTime, DateTime endTime, int roomId)
+        {
+            return await _dbContext
+                .BookingRooms.Where(bkr =>
+                    bkr.Booking!.CheckInTime >= startTime
+                    && bkr.Booking!.CheckOutTime < endTime
+                    && (
+                        bkr.Booking!.Status == BookingStatus.CheckedIn
+                        || bkr.Booking!.Status == BookingStatus.CheckedOut
+                        || bkr.Booking!.Status == BookingStatus.PaymentDone
+                    )
+                    && bkr.RoomId == roomId
+                )
+                .CountAsync();
+        }
     }
 }

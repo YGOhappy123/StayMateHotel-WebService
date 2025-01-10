@@ -54,7 +54,7 @@ namespace server.Controllers
                 return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
             }
 
-            return StatusCode(result.Status, new SuccessResponseDto { Data = result.Data!.ToRoomDto() });
+            return StatusCode(result.Status, new SuccessResponseDto { Data = result.Data });
         }
 
         [Authorize(Roles = "Admin")]
