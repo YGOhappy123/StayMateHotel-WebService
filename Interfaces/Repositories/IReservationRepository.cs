@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using server.Dtos.Statistic;
 using server.Enums;
 using server.Models;
 using server.Queries;
@@ -18,5 +19,7 @@ namespace server.Interfaces.Repositories
         Task UpdateBooking(Booking booking);
         Task CancelReservationsWithDuplicateRooms(DateTime checkInDate, DateTime checkOutDate, int bookingId, int roomId);
         Task<int> CountBookingsByStatus(BookingStatus status, TimeRangeQueryObject queryObject);
+        Task<int> CountBookingsMadeInTimeRange(DateTime startTime, DateTime endTime);
+        Task<List<Booking>> GetBookingsMadeInTimeRange(DateTime startTime, DateTime endTime);
     }
 }

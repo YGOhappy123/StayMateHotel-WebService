@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Statistic;
 using server.Interfaces.Repositories;
 using server.Models;
 using server.Queries;
@@ -129,6 +130,75 @@ namespace server.Repositories
         {
             _dbContext.Guests.Update(guest);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> CountGuestsCreatedInTimeRange(DateTime startTime, DateTime endTime)
+        {
+            return await _dbContext.Guests.Where(g => g.CreatedAt >= startTime && g.CreatedAt < endTime).CountAsync();
+        }
+
+        public async Task<List<GuestWithBookingCount>> GetGuestsWithHighestBookingCountInTimeRange(
+            DateTime startTime,
+            DateTime endTime,
+            int limit
+        )
+        {
+            var highestBookingCountGuestIds = await _dbContext
+                .Bookings.Where(bk => bk.CreatedAt >= startTime && bk.CreatedAt < endTime)
+                .GroupBy(bk => bk.GuestId)
+                .Select(g => new { GuestId = g.Key, BookingCount = g.Count() })
+                .OrderByDescending(x => x.BookingCount)
+                .Take(limit)
+                .Select(x => new { x.GuestId, x.BookingCount })
+                .ToListAsync();
+
+            List<GuestWithBookingCount> result = [];
+            foreach (var item in highestBookingCountGuestIds)
+            {
+                var guestInfo = await _dbContext.Guests.Include(g => g.Account).Where(g => g.Id == item.GuestId).FirstOrDefaultAsync();
+
+                if (guestInfo != null)
+                {
+                    result.Add(new GuestWithBookingCount(guestInfo, item.BookingCount));
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<List<GuestWithTotalPayment>> GetGuestsWithHighestPaymentAmountInTimeRange(
+            DateTime startTime,
+            DateTime endTime,
+            int limit
+        )
+        {
+            var highestTotalPaymentGuestIds = await _dbContext
+                .Payments.Where(pm => pm.PaymentTime >= startTime && pm.PaymentTime < endTime)
+                .Join(
+                    _dbContext.Bookings,
+                    payment => payment.BookingId,
+                    booking => booking.Id,
+                    (payment, booking) => new { payment.Amount, booking.GuestId }
+                )
+                .GroupBy(pm => pm.GuestId)
+                .Select(g => new { GuestId = g.Key, TotalPayment = g.Sum(g => g.Amount) })
+                .OrderByDescending(x => x.TotalPayment)
+                .Take(limit)
+                .Select(x => new { x.GuestId, x.TotalPayment })
+                .ToListAsync();
+
+            List<GuestWithTotalPayment> result = [];
+            foreach (var item in highestTotalPaymentGuestIds)
+            {
+                var guestInfo = await _dbContext.Guests.Include(g => g.Account).Where(g => g.Id == item.GuestId).FirstOrDefaultAsync();
+
+                if (guestInfo != null)
+                {
+                    result.Add(new GuestWithTotalPayment(guestInfo, item.TotalPayment));
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using server.Dtos.Statistic;
 using server.Models;
 using server.Queries;
 
@@ -19,5 +20,6 @@ namespace server.Interfaces.Repositories
         Task<bool> CheckIfRoomIsBooked(int roomId);
         Task DeleteOldImagesOfRoom(int roomId);
         Task<int> GetRoomStatisticInTimeRange(DateTime startTime, DateTime endTime, int roomId);
+        Task<List<RoomWithBookingCount>> GetMostBookedRoomsInTimeRange(DateTime startTime, DateTime endTime, int limit);
     }
 }

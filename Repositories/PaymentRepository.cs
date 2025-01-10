@@ -112,5 +112,15 @@ namespace server.Repositories
             _dbContext.Payments.Add(payment);
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<decimal> SumPaymentValuesInTimeRange(DateTime startTime, DateTime endTime)
+        {
+            return await _dbContext.Payments.Where(pm => pm.PaymentTime >= startTime && pm.PaymentTime < endTime).SumAsync(pm => pm.Amount);
+        }
+
+        public async Task<List<Payment>> GetPaymentsMadeInTimeRange(DateTime startTime, DateTime endTime)
+        {
+            return await _dbContext.Payments.Where(pm => pm.PaymentTime >= startTime && pm.PaymentTime < endTime).ToListAsync();
+        }
     }
 }

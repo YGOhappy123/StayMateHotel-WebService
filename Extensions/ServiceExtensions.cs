@@ -141,6 +141,7 @@ namespace server.Extensions
             services.AddScoped<IMailerService, MailerService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IReservationService, ReservationService>();
+            services.AddScoped<IStatisticService, StatisticService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IFloorService, FloorService>();
             services.AddScoped<IRoomClassService, RoomClassService>();
