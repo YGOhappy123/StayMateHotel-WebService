@@ -12,5 +12,7 @@ namespace server.Interfaces.Repositories
         Task<(List<Payment>, int)> GetAllPayments(BaseQueryObject queryObject);
         Task<decimal> GetBookingToTalPayments(int bookingId);
         Task MakeNewPayment(Payment payment);
+        Task<decimal> SumPaymentValuesInTimeRange(DateTime startTime, DateTime endTime);
+        Task<List<Payment>> GetPaymentsMadeInTimeRange(DateTime startTime, DateTime endTime);
     }
 }
