@@ -83,5 +83,39 @@ namespace server.Extensions.Mappers
                 BookingId = payment.BookingId ?? 0,
             };
         }
+
+        public static BookingServiceDto ToBookingServiceDto(this BookingService bookingService)
+        {
+            return new BookingServiceDto
+            {
+                Id = bookingService.Id,
+                Quantity = bookingService.Quantity,
+                UnitPrice = bookingService.UnitPrice,
+                Status = bookingService.Status.ToString(),
+                CreatedAt = bookingService.CreatedAt,
+                Booking =
+                    bookingService.Booking == null
+                        ? null
+                        : new BookingInfo
+                        {
+                            Id = bookingService.Booking.Id,
+                            Email = bookingService.Booking.Email,
+                            PhoneNumber = bookingService.Booking.PhoneNumber,
+                            Guest =
+                                bookingService.Booking?.Guest == null
+                                    ? null
+                                    : new GuestInfo
+                                    {
+                                        Id = bookingService.Booking.Guest.Id,
+                                        FirstName = bookingService.Booking.Guest.FirstName,
+                                        LastName = bookingService.Booking.Guest.LastName,
+                                    },
+                        },
+                Service =
+                    bookingService.Service == null
+                        ? null
+                        : new ServiceInfo { Id = (int)bookingService.ServiceId!, Name = bookingService.Service.Name },
+            };
+        }
     }
 }

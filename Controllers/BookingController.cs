@@ -80,6 +80,14 @@ namespace server.Controllers
         [HttpPost("make-booking")]
         public async Task<IActionResult> MakeNewBooking(MakeBookingDto makeBookingDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
             var authUserId = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
 
             var result = await _reservationService.MakeNewBooking(makeBookingDto, int.Parse(authUserId!));
@@ -220,6 +228,100 @@ namespace server.Controllers
                     Took = result.Took,
                 }
             );
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("booking-services")]
+        public async Task<IActionResult> GetAllBookingServices([FromQuery] BaseQueryObject queryObject)
+        {
+            var result = await _reservationService.GetAllBookingServices(queryObject);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(
+                result.Status,
+                new SuccessResponseDto
+                {
+                    Data = result.Data!.Select(bks => bks.ToBookingServiceDto()),
+                    Total = result.Total,
+                    Took = result.Took,
+                }
+            );
+        }
+
+        [Authorize(Roles = "Guest")]
+        [HttpPost("{bookingId:int}/book-service")]
+        public async Task<IActionResult> BookService([FromRoute] int bookingId, [FromBody] OrderBookingServiceDto orderBookingServiceDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var result = await _reservationService.BookService(orderBookingServiceDto, bookingId);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("accept-booking-services/{bookingServiceId:int}")]
+        public async Task<IActionResult> AcceptBookingService([FromRoute] int bookingServiceId)
+        {
+            var result = await _reservationService.AcceptBookingService(bookingServiceId);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("reject-booking-services/{bookingServiceId:int}")]
+        public async Task<IActionResult> RejectBookingService([FromRoute] int bookingServiceId)
+        {
+            var result = await _reservationService.RejectBookingService(bookingServiceId);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("hand-over-booking-services/{bookingServiceId:int}")]
+        public async Task<IActionResult> HandOverBookingService([FromRoute] int bookingServiceId)
+        {
+            var result = await _reservationService.HandOverBookingService(bookingServiceId);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("booking-services/count-by-status")]
+        public async Task<IActionResult> CountBookingServicesByStatus([FromQuery] TimeRangeQueryObject queryObject)
+        {
+            var result = await _reservationService.CountBookingServicesByStatus(queryObject);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Data = result.Data });
         }
     }
 }

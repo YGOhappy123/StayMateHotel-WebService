@@ -24,7 +24,6 @@ namespace server.Controllers
             _roomClassService = roomClassService;
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllRoomClasses([FromQuery] BaseQueryObject queryObject)
         {

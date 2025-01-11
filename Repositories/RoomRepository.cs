@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Statistic;
 using server.Enums;
 using server.Interfaces.Repositories;
 using server.Models;
@@ -188,6 +189,61 @@ namespace server.Repositories
 
             _dbContext.RoomImages.RemoveRange(images);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> GetRoomStatisticInTimeRange(DateTime startTime, DateTime endTime, int roomId)
+        {
+            return await _dbContext
+                .BookingRooms.Where(bkr =>
+                    bkr.Booking!.CheckInTime >= startTime
+                    && bkr.Booking!.CheckInTime < endTime
+                    && (
+                        bkr.Booking!.Status == BookingStatus.CheckedIn
+                        || bkr.Booking!.Status == BookingStatus.CheckedOut
+                        || bkr.Booking!.Status == BookingStatus.PaymentDone
+                    )
+                    && bkr.RoomId == roomId
+                )
+                .CountAsync();
+        }
+
+        public async Task<List<RoomWithBookingCount>> GetMostBookedRoomsInTimeRange(DateTime startTime, DateTime endTime, int limit)
+        {
+            var mostBookedRoomIds = await _dbContext
+                .BookingRooms.Where(bkr =>
+                    bkr.Booking!.CheckInTime >= startTime
+                    && bkr.Booking!.CheckInTime < endTime
+                    && (
+                        bkr.Booking!.Status == BookingStatus.CheckedIn
+                        || bkr.Booking!.Status == BookingStatus.CheckedOut
+                        || bkr.Booking!.Status == BookingStatus.PaymentDone
+                    )
+                )
+                .GroupBy(bkr => bkr.RoomId)
+                .Select(g => new { RoomId = g.Key, BookingCount = g.Count() })
+                .OrderByDescending(x => x.BookingCount)
+                .Take(limit)
+                .Select(x => new { x.RoomId, x.BookingCount })
+                .ToListAsync();
+
+            List<RoomWithBookingCount> result = [];
+            foreach (var item in mostBookedRoomIds)
+            {
+                var roomInfo = await _dbContext
+                    .Rooms.Include(rm => rm.Floor)
+                    .Include(rm => rm.CreatedBy)
+                    .Include(rm => rm.Images)
+                    .Include(rm => rm.RoomClass)
+                    .Where(rm => rm.Id == item.RoomId)
+                    .FirstOrDefaultAsync();
+
+                if (roomInfo != null)
+                {
+                    result.Add(new RoomWithBookingCount(roomInfo, item.BookingCount));
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -38,12 +38,12 @@ namespace server.Services
             };
         }
 
-        public async Task<ServiceResponse<Room>> GetRoomById(int roomId)
+        public async Task<ServiceResponse<object>> GetRoomById(int roomId)
         {
             var room = await _roomRepo.GetRoomById(roomId);
-            if (room == null || room.Status != RoomStatus.Available)
+            if (room == null || room.Status == RoomStatus.OutOfService)
             {
-                return new ServiceResponse<Room>
+                return new ServiceResponse<object>
                 {
                     Status = ResStatusCode.NOT_FOUND,
                     Success = false,
@@ -51,11 +51,43 @@ namespace server.Services
                 };
             }
 
-            return new ServiceResponse<Room>
+            var currentTime = TimestampHandler.GetNow();
+            var startOfCurrentYear = TimestampHandler.GetStartOfTimeByType(currentTime, "yearly");
+            var startOfCurrentMonth = TimestampHandler.GetStartOfTimeByType(currentTime, "monthly");
+            var statisticThisYear = await _roomRepo.GetRoomStatisticInTimeRange(startOfCurrentYear, currentTime, roomId);
+            var statisticThisMonth = await _roomRepo.GetRoomStatisticInTimeRange(startOfCurrentMonth, currentTime, roomId);
+
+            return new ServiceResponse<object>
             {
                 Status = ResStatusCode.OK,
                 Success = true,
-                Data = room,
+                Data = new
+                {
+                    room.RoomNumber,
+                    Images = room.Images.Select(img => img.ImageUrl).ToList(),
+                    StatisticThisYear = statisticThisYear,
+                    StatisticThisMonth = statisticThisMonth,
+                    Floor = room?.Floor == null ? null : new RoomFloorInfo { Id = room.Floor.Id, FloorNumber = room.Floor.FloorNumber },
+                    RoomClass = room?.RoomClass == null
+                        ? null
+                        : new RoomRoomClassInfo
+                        {
+                            Id = room.RoomClass.Id,
+                            ClassName = room.RoomClass.ClassName,
+                            BasePrice = room.RoomClass.BasePrice,
+                            Capacity = room.RoomClass.Capacity,
+                        },
+                    Features = room?.RoomClass == null
+                        ? null
+                        : room
+                            .RoomClass.RoomClassFeatures.Select(ft => new RoomFeatureInfo
+                            {
+                                FeatureId = ft.FeatureId,
+                                Name = ft.Feature?.Name,
+                                Quantity = ft.Quantity,
+                            })
+                            .ToList(),
+                },
             };
         }
 

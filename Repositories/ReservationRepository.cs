@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using server.Data;
+using server.Dtos.Statistic;
 using server.Enums;
 using server.Interfaces.Repositories;
 using server.Models;
@@ -75,6 +76,9 @@ namespace server.Repositories
                             query = query.Where(bk =>
                                 bk.Guest != null && (bk.Guest.FirstName.Contains(value) || bk.Guest.LastName.Contains(value))
                             );
+                            break;
+                        case "status":
+                            query = query.Where(bk => bk.Status == Enum.Parse<BookingStatus>(value));
                             break;
                         default:
                             query = query.Where(bk => EF.Property<string>(bk, filter.Key.CapitalizeWord()) == value);
@@ -260,6 +264,16 @@ namespace server.Repositories
             }
 
             return await query.CountAsync();
+        }
+
+        public async Task<int> CountBookingsMadeInTimeRange(DateTime startTime, DateTime endTime)
+        {
+            return await _dbContext.Bookings.Where(bk => bk.CreatedAt >= startTime && bk.CreatedAt < endTime).CountAsync();
+        }
+
+        public async Task<List<Booking>> GetBookingsMadeInTimeRange(DateTime startTime, DateTime endTime)
+        {
+            return await _dbContext.Bookings.Where(bk => bk.CreatedAt >= startTime && bk.CreatedAt < endTime).ToListAsync();
         }
     }
 }
