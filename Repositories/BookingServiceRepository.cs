@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -32,6 +32,22 @@ namespace server.Repositories
                 {
                     switch (filter.Key)
                     {
+                        case "customerName":
+                            var nameParts = value.Split(' '); 
+                            query = query.Where(bks => nameParts.All(part =>
+                                bks.Booking.Guest.FirstName.Contains(part) ||
+                                bks.Booking.Guest.LastName.Contains(part)
+                            ));
+                            break;
+                        case "bookingServiceId":
+                            query = query.Where(bks => bks.Id == Convert.ToInt32(value)); 
+                            break;
+                        case "bookingId":
+                            query = query.Where(bks => bks.BookingId == Convert.ToInt32(value));
+                            break;
+                        case "serviceName":
+                            query = query.Where(bks => bks.Service.Name.Contains(value));
+                            break;
                         case "startTime":
                             query = query.Where(bks => bks.CreatedAt >= DateTime.Parse(value));
                             break;
@@ -41,10 +57,10 @@ namespace server.Repositories
                             );
                             break;
                         case "minPrice":
-                            query = query.Where(bks => bks.UnitPrice >= Convert.ToDecimal(value));
+                            query = query.Where(bks => bks.UnitPrice * bks.Quantity >= Convert.ToDecimal(value));
                             break;
                         case "maxPrice":
-                            query = query.Where(bks => bks.UnitPrice <= Convert.ToDecimal(value));
+                            query = query.Where(bks => bks.UnitPrice * bks.Quantity <= Convert.ToDecimal(value));
                             break;
                         case "status":
                             query = query.Where(bks => bks.Status == Enum.Parse<BookingServiceStatus>(value));
@@ -63,10 +79,21 @@ namespace server.Repositories
         {
             foreach (var order in sort)
             {
-                query =
-                    order.Value == "ASC"
-                        ? query.OrderBy(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()))
-                        : query.OrderByDescending(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()));
+                switch (order.Key.ToLower())
+                {
+                    case "price":
+                        query = order.Value == "ASC"
+                            ? query.OrderBy(mt => mt.UnitPrice * mt.Quantity) 
+                            : query.OrderByDescending(mt => mt.UnitPrice * mt.Quantity); 
+                        break;
+
+                    // Các trường hợp sắp xếp khác
+                    default:
+                        query = order.Value == "ASC"
+                            ? query.OrderBy(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()))
+                            : query.OrderByDescending(mt => EF.Property<object>(mt, order.Key.CapitalizeWord()));
+                        break;
+                }
             }
 
             return query;
