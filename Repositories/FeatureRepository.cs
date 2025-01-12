@@ -51,11 +51,10 @@ namespace server.Repositories
                             //    f.RoomClassFeatures.All(rmc =>
                             //        roomClassIds!.Contains(rmc.RoomClassId.GetValueOrDefault()) // Lấy giá trị của RoomClassId nếu có
                             //    )
-//=======
+
                             query = query.Where(feature =>
                                 roomClassIds!.All(roomClassId => feature.RoomClassFeatures.Any(rcf => rcf.RoomClassId == roomClassId))
-//>>>>>>> main
-                            );
+                                );
                             break;
                         default:
                             query = query.Where(f => EF.Property<string>(f, filter.Key.CapitalizeWord()) == value);

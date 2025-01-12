@@ -20,5 +20,6 @@ namespace server.Models
         public Booking? Booking { get; set; }
         public int? ServiceId { get; set; }
         public Service? Service { get; set; }
+        
     }
 }
