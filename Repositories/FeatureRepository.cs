@@ -39,10 +39,10 @@ namespace server.Repositories
                             query = query.Where(f => f.CreatedById == Convert.ToInt32(value));
                             break;
                         case "startTime":
-                            query = query.Where(f => f.CreatedAt >= DateTime.Parse(value));
+                            query = query.Where(rm => rm.CreatedAt >= DateTime.Parse(value));
                             break;
                         case "endTime":
-                            query = query.Where(f => f.CreatedAt <= DateTime.Parse(value));
+                            query = query.Where(rm => rm.CreatedAt <= TimestampHandler.GetEndOfTimeByType(DateTime.Parse(value), "daily"));
                             break;
                         case "roomClasses":
                             var roomClassIds = JsonSerializer.Deserialize<List<int>>(filter.Value.ToString() ?? "[]");
