@@ -156,7 +156,7 @@ namespace server.Services
                 {
                     Status = ResStatusCode.UNAUTHORIZED,
                     Success = false,
-                    Message = ErrorMessage.INCORRECT_USERNAME_OR_PASSWORD,
+                    Message = ErrorMessage.INCORRECT_PASSWORD,
                 };
             }
 

@@ -43,6 +43,26 @@ namespace server.Controllers
             return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message, Data = new { result.ImageUrl } });
         }
 
+        [HttpPost("upload-base64-image")]
+        public async Task<IActionResult> UploadBase64Image([FromForm] UploadBase64ImageDto uploadImageDto, [FromQuery] string? folder)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(
+                    ResStatusCode.UNPROCESSABLE_ENTITY,
+                    new ErrorResponseDto { Message = ErrorMessage.DATA_VALIDATION_FAILED }
+                );
+            }
+
+            var result = await _fileService.UploadBase64ImageToCloudinary(uploadImageDto.Base64Image, folder);
+            if (!result.Success)
+            {
+                return StatusCode(result.Status, new ErrorResponseDto { Message = result.Message });
+            }
+
+            return StatusCode(result.Status, new SuccessResponseDto { Message = result.Message, Data = new { result.ImageUrl } });
+        }
+
         [HttpPost("delete-image")]
         public async Task<IActionResult> DeleteSingleImage([FromBody] DeleteImageDto deleteImageDto)
         {
