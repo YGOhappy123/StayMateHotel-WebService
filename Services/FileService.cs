@@ -69,6 +69,43 @@ namespace server.Services
             }
         }
 
+        public async Task<ServiceResponse> UploadBase64ImageToCloudinary(string base64Image, string? folderName)
+        {
+            try
+            {
+                if (!base64Image.StartsWith("data:image/"))
+                {
+                    base64Image = "data:image/jpeg;base64," + base64Image;
+                }
+
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(base64Image),
+                    Folder = string.IsNullOrWhiteSpace(folderName) ? "stay-mate-hotel" : folderName,
+                };
+
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                bool isSuccess = uploadResult.StatusCode == System.Net.HttpStatusCode.OK;
+
+                return new ServiceResponse
+                {
+                    Status = isSuccess ? ResStatusCode.OK : ResStatusCode.INTERNAL_SERVER_ERROR,
+                    Success = isSuccess,
+                    Message = isSuccess ? SuccessMessage.UPLOAD_IMAGE_SUCCESSFULLY : ErrorMessage.UPLOAD_IMAGE_FAILED,
+                    ImageUrl = isSuccess ? uploadResult.SecureUrl.ToString() : "",
+                };
+            }
+            catch (Exception)
+            {
+                return new ServiceResponse
+                {
+                    Status = ResStatusCode.INTERNAL_SERVER_ERROR,
+                    Success = false,
+                    Message = ErrorMessage.UPLOAD_IMAGE_FAILED,
+                };
+            }
+        }
+
         public async Task<ServiceResponse> DeleteImageFromCloudinary(string imageUrl)
         {
             try

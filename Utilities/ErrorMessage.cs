@@ -11,6 +11,7 @@ namespace server.Utilities
         public const string EMAIL_EXISTED = "EMAIL_EXISTED";
         public const string PHONE_NUMBER_EXISTED = "PHONE_NUMBER_EXISTED";
         public const string USER_NOT_FOUND = "USER_NOT_FOUND";
+        public const string INCORRECT_PASSWORD = "INCORRECT_PASSWORD";
         public const string INCORRECT_USERNAME_OR_PASSWORD = "INCORRECT_USERNAME_OR_PASSWORD";
         public const string GOOGLE_AUTH_FAILED = "GOOGLE_AUTH_FAILED";
         public const string ROOM_NOT_FOUND = "ROOM_NOT_FOUND";
