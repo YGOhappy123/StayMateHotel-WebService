@@ -150,5 +150,12 @@ namespace server.Extensions
 
             return services;
         }
+
+        public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
+        {
+            services.AddHostedService<AppBackgroundService>();
+
+            return services;
+        }
     }
 }

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using server.Extensions;
-using server.Interfaces.Services;
-using server.Models;
-using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +10,7 @@ builder.Services.AddJsonOptionsForControllers();
 builder.Services.AddSwaggerDocumentation();
 builder.Services.AddCorsPolicies();
 builder.Services.AddApplicationServices();
+builder.Services.AddBackgroundServices();
 builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.ConfigureApiBehavior();
